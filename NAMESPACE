@@ -2,4 +2,5 @@
 
 export("%>%")
 export(data_to_planning_grid)
+export(get_planning_grid)
 importFrom(magrittr,"%>%")

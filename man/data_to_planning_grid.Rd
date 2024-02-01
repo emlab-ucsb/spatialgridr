@@ -36,12 +36,18 @@ data_to_planning_grid(
 Get gridded or cropped data from input data
 }
 \examples{
-# Get knolls data
-knolls <- system.file("extdata", "knolls.rds", package = "oceandatr", mustWork = TRUE) \%>\% readRDS() 
-# Get EEZ data
-bermuda_eez <- get_area(area_name = "Bermuda", mregions_column = "territory1")
+# knolls data for area of Pacific
+knolls <- system.file("extdata", "ridges.rds", package = "spatialgridr") |> readRDS()
+# an area of interest, in this case Samoa's Exclusive Economic Zone
+samoa_eez <- system.file("extdata", "samoa_eez.rds", package = "spatialgridr") |> readRDS()
 # Create a planning grid
-planning_grid <- get_planning_grid(area_polygon = bermuda_eez, projection_crs = '+proj=laea +lon_0=-64.8108333 +lat_0=32.3571917 +datum=WGS84 +units=m +no_defs', resolution = 5000)
-# Get knolls data into the planning grid
+planning_grid <- get_planning_grid(area_polygon = samoa_eez, projection_crs = '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 5000)
+# Get knolls data, which is vector data in sf format, in the planning grid
 knolls_gridded <- data_to_planning_grid(planning_grid = planning_grid, dat = knolls)
+terra::plot(knolls_gridded)
+
+#Get some raster data on cold water corals for the same planning grid
+cold_coral <- system.file("extdata", "cold_coral.rds", package = "spatialgridr") |> readRDS()
+coral_gridded <- data_to_planning_grid(planning_grid = planning_grid, dat = cold_coral)
+terra::plot(cold_coral)
 }
