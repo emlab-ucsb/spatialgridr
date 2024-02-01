@@ -24,9 +24,9 @@
 #' terra::plot(knolls_gridded)
 #'
 #' #Get some raster data on cold water corals for the same planning grid
-#' cold_coral <- system.file("extdata", "cold_coral.rds", package = "spatialgridr") |> readRDS()
+#' cold_coral <- system.file("extdata", "cold_coral.tif", package = "spatialgridr") |> terra::rast()
 #' coral_gridded <- data_to_planning_grid(planning_grid = planning_grid, dat = cold_coral)
-#' terra::plot(cold_coral)
+#' terra::plot(coral_gridded)
 data_to_planning_grid <- function(area_polygon = NULL, planning_grid = NULL, dat = NULL, meth = NULL, name = NULL, sf_col_layer_names = NULL, antimeridian = NULL){
   if(is.null(dat)){
     stop("Please provide some input data")
