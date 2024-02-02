@@ -40,8 +40,12 @@ Get gridded or cropped data from input data
 knolls <- system.file("extdata", "ridges.rds", package = "spatialgridr") |> readRDS()
 # an area of interest, in this case Samoa's Exclusive Economic Zone
 samoa_eez <- system.file("extdata", "samoa_eez.rds", package = "spatialgridr") |> readRDS()
-# Create a planning grid
-planning_grid <- get_planning_grid(area_polygon = samoa_eez, projection_crs = '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 5000)
+
+# You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
+samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
+
+# Create a planning grid with 5km sized planning units
+planning_grid <- get_planning_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
 # Get knolls data, which is vector data in sf format, in the planning grid
 knolls_gridded <- data_to_planning_grid(planning_grid = planning_grid, dat = knolls)
 terra::plot(knolls_gridded)

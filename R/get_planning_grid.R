@@ -16,8 +16,10 @@
 #' @examples
 #' # an area of interest, in this case Samoa's Exclusive Economic Zone
 #' samoa_eez <- system.file("extdata", "samoa_eez.rds", package = "spatialgridr") |> readRDS()
-#' # Create a planning grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `projection_crs`. You can a suitable equal area projection for your area of interest from https://projectionwizard.org
-#' planning_grid <- get_planning_grid(area_polygon = samoa_eez, projection_crs = '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 5000)
+#' # You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
+#' samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
+#' # Create a planning grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `projection_crs`.
+#' planning_grid <- get_planning_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
 
 get_planning_grid <- function(area_polygon, projection_crs, option = "raster", resolution = 5000){
 
@@ -47,10 +49,10 @@ get_planning_grid <- function(area_polygon, projection_crs, option = "raster", r
     grid_out[overlap,] %>%
       dplyr::bind_cols(sf::st_coordinates(sf::st_centroid(.)) %>%
                          as.data.frame() %>%
-                         dplyr::select(X, Y)) %>%
-      dplyr::mutate(X = round(X, digits = 4),
-                    Y = round(Y, digits = 4)) %>%
-      dplyr::arrange(dplyr::desc(Y), X) %>%
-      dplyr::select(-X, -Y)
+                         dplyr::select(.data$X, .data$Y)) %>%
+      dplyr::mutate(X = round(.data$X, digits = 4),
+                    Y = round(.data$Y, digits = 4)) %>%
+      dplyr::arrange(dplyr::desc(.data$Y), .data$X) %>%
+      dplyr::select(-.data$X, -.data$Y)
   }
 }

@@ -11,6 +11,7 @@ Imports:
     dplyr,
     exactextractr,
     magrittr,
+    rlang,
     sf,
     stats,
     terra
