@@ -49,10 +49,10 @@ get_grid <- function(area_polygon, projection_crs, option = "raster", resolution
     grid_out[overlap,] %>%
       dplyr::bind_cols(sf::st_coordinates(sf::st_centroid(.)) %>%
                          as.data.frame() %>%
-                         dplyr::select(.data$X, .data$Y)) %>%
+                         dplyr::select("X", "Y")) %>%
       dplyr::mutate(X = round(.data$X, digits = 4),
                     Y = round(.data$Y, digits = 4)) %>%
       dplyr::arrange(dplyr::desc(.data$Y), .data$X) %>%
-      dplyr::select(-.data$X, -.data$Y)
+      dplyr::select(-"X", -"Y")
   }
 }

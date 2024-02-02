@@ -16,5 +16,7 @@ Imports:
     stats,
     terra
 Suggests: 
-    codetools
+    codetools,
+    testthat (>= 3.0.0)
 URL: https://emlab-ucsb.github.io/spatialgridr/
+Config/testthat/edition: 3

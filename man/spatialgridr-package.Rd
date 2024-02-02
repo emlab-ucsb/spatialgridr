@@ -8,6 +8,13 @@
 \description{
 An R package that allows easy gridding of spatial data. Principally intended for spatial conservation planning uses.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://emlab-ucsb.github.io/spatialgridr/}
+}
+
+}
 \author{
 \strong{Maintainer}: Jason Flower \email{jflower@ucsb.edu} (\href{https://orcid.org/0000-0002-6731-8182}{ORCID})
 
