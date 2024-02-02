@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-You can install the development version of spatialgridr from [GitHub](https://github.com/) with:
+You can install the development version of spatialgridr from GitHub with:
 
 ``` r
 # install.packages("devtools")

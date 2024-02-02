@@ -11,8 +11,8 @@ raw spatial data and getting that data into a grid.
 
 ## Installation
 
-You can install the development version of spatialgridr from
-[GitHub](https://github.com/) with:
+You can install the development version of spatialgridr from GitHub
+with:
 
 ``` r
 # install.packages("devtools")
