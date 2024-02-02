@@ -19,9 +19,9 @@
 #' # You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
 #' samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 #' # Create a planning grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `projection_crs`.
-#' planning_grid <- get_planning_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
+#' planning_grid <- get_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
 
-get_planning_grid <- function(area_polygon, projection_crs, option = "raster", resolution = 5000){
+get_grid <- function(area_polygon, projection_crs, option = "raster", resolution = 5000){
 
   # Add repeated errors for area_polygon
   if(!check_sf(area_polygon)) {

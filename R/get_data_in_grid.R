@@ -1,7 +1,7 @@
 #' Get gridded or cropped data from input data
 #'
 #' @param area_polygon `sf` polygon
-#' @param planning_grid `sf` or `terra::rast()` planning grid
+#' @param spatial_grid `sf` or `terra::rast()` planning grid
 #' @param dat `sf` or `terra::rast()` data to be gridded/ cropped
 #' @param meth `character` method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as `exactextractr::exact_extract()` is used for gridding to sf planning grid, whereas `terra::project()`/`terra::resample()` is used for transforming/ gridding raster data.
 #' @param name `character` to name the data output
@@ -22,28 +22,28 @@
 #' samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 #'
 #' # Create a planning grid with 5km sized planning units
-#' planning_grid <- get_planning_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
+#' planning_grid <- get_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
 #' # Get knolls data, which is vector data in sf format, in the planning grid
-#' knolls_gridded <- data_to_planning_grid(planning_grid = planning_grid, dat = knolls)
+#' knolls_gridded <- get_data_in_grid(spatial_grid = planning_grid, dat = knolls)
 #' terra::plot(knolls_gridded)
 #'
 #' #Get some raster data on cold water corals for the same planning grid
 #' cold_coral <- system.file("extdata", "cold_coral.tif", package = "spatialgridr") |> terra::rast()
-#' coral_gridded <- data_to_planning_grid(planning_grid = planning_grid, dat = cold_coral)
+#' coral_gridded <- get_data_in_grid(spatial_grid = planning_grid, dat = cold_coral)
 #' terra::plot(coral_gridded)
-data_to_planning_grid <- function(area_polygon = NULL, planning_grid = NULL, dat = NULL, meth = NULL, name = NULL, sf_col_layer_names = NULL, antimeridian = NULL){
+get_data_in_grid <- function(area_polygon = NULL, spatial_grid = NULL, dat = NULL, meth = NULL, name = NULL, sf_col_layer_names = NULL, antimeridian = NULL){
   if(is.null(dat)){
     stop("Please provide some input data")
   }
-  check_grid_or_polygon(planning_grid, area_polygon)
+  check_grid_or_polygon(spatial_grid, area_polygon)
 
   dat <- data_from_filepath(dat)
 
-  matching_crs <- check_matching_crs(area_polygon, planning_grid, dat)
+  matching_crs <- check_matching_crs(area_polygon, spatial_grid, dat)
 
   antimeridian <- if(is.null(antimeridian)){
-    sf_object <- if(is.null(planning_grid)) area_polygon else{
-      if(check_sf(planning_grid)) planning_grid else terra::as.polygons(planning_grid) %>% sf::st_as_sf()
+    sf_object <- if(is.null(spatial_grid)) area_polygon else{
+      if(check_sf(spatial_grid)) spatial_grid else terra::as.polygons(spatial_grid) %>% sf::st_as_sf()
     }
     check_antimeridian(sf_object)
   } else antimeridian
@@ -62,9 +62,9 @@ data_to_planning_grid <- function(area_polygon = NULL, planning_grid = NULL, dat
         unlist() %>%
         unique() %>%
         {if(all(. %in% c(0,1,NA,NaN))) {
-          if(check_raster(planning_grid)) 'near' else 'mode'
+          if(check_raster(spatial_grid)) 'near' else 'mode'
         } else {
-            if(check_raster(planning_grid)) 'average' else 'mean'
+            if(check_raster(spatial_grid)) 'average' else 'mean'
           }
     }
   }
@@ -73,9 +73,9 @@ data_to_planning_grid <- function(area_polygon = NULL, planning_grid = NULL, dat
     get_raw_data(area_polygon, dat, meth, matching_crs, antimeridian)
 
   } else if(check_raster(dat)){
-    ras_to_planning_grid(dat, planning_grid, matching_crs, meth, name, antimeridian)
+    ras_to_grid(dat, spatial_grid, matching_crs, meth, name, antimeridian)
     } else {
-    sf_to_planning_grid(dat, planning_grid, matching_crs, name, sf_col_layer_names, antimeridian)
+    sf_to_grid(dat, spatial_grid, matching_crs, name, sf_col_layer_names, antimeridian)
   }
 
 }
