@@ -9,9 +9,12 @@
 `spatialgridr` provides functions for gridding spatial data; i.e. taking
 raw spatial data and getting that data into a grid.
 
+This package is still under development. Feel free to submit an issue
+with bugs or suggestions.
+
 ## Installation
 
-You can install the development version of spatialgridr from GitHub
+You can install the development version of `spatialgridr` from GitHub
 with:
 
 ``` r
