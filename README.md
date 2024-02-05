@@ -1,10 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-# spatialgridr
-
 <!-- badges: start -->
 <!-- badges: end -->
+
+# spatialgridr <a href="https://emlab-ucsb.github.io/spatialgridr/"><img src="man/figures/logo.png" align="right" height="139" alt="spatialgridr website" /></a>
 
 `spatialgridr` provides functions for gridding spatial data; i.e. taking
 raw spatial data and getting that data into a grid.
@@ -62,7 +61,6 @@ square or hexagonal cells. We will create and plot a hexagonal grid with
 10 km wide cells.
 
 ``` r
-
 planning_grid_sf <- get_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 10000, option = "sf_hex")
 
 plot(planning_grid_sf)
@@ -104,3 +102,15 @@ terra::lines(samoa_eez |> sf::st_transform(crs = samoa_projection)) #add Samoa's
 ```
 
 <img src="man/figures/README-grid_raster_data-1.png" width="100%" />
+
+We can also use the sf grid we created to return data in sf format:
+
+``` r
+#grid the data
+knolls_gridded_sf <- get_data_in_grid(spatial_grid = planning_grid_sf, dat = knolls)
+
+#plot
+plot(knolls_gridded_sf)
+```
+
+<img src="man/figures/README-grid_sf_to_sf-1.png" width="100%" />

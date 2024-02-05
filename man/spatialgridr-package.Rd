@@ -6,6 +6,8 @@
 \alias{spatialgridr-package}
 \title{spatialgridr: Grid spatial data for conservation planning purposes}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 An R package that allows easy gridding of spatial data. Principally intended for spatial conservation planning uses.
 }
 \seealso{
