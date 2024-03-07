@@ -25,7 +25,9 @@ sf_to_raster_by_coverage_fraction <- exactextractr::coverage_fraction(r, lux_sf_
 
 plot(sf_to_raster_by_coverage_fraction)
 
-#sf to raster for continuous sf objects
+plot(sum(sf_to_raster_by_coverage_fraction, na.rm = T))
+
+#sf to raster for continuous sf objects - not needed
 
 grouping_col <- "POP"
 
@@ -53,11 +55,35 @@ sf_grid %>%
   plot()
 
 #new approach
+
+grouping_col <- "NAME_2"
+
+sf_grid_id <- sf_grid %>%
+  dplyr::mutate(cellID = 1:nrow(.))
+
+intersected_data <- lux_sf %>%
+  dplyr::group_by(.data[[grouping_col]]) %>%
+  dplyr::summarise() %>%
+  split(seq(nrow(.))) %>%
+  lapply(function(x) sf::st_intersection(sf_grid_id, x))
+
+lux_sf_dummy <- lux_sf %>%
+  dplyr::select(dplyr::all_of(grouping_col)) %>%
+  model.matrix(formula(paste("~", grouping_col, "-1")), .) %>%
+  as.data.frame() %>%
+  setNames(lux_sf[[grouping_col]]) %>%
+  sf::st_set_geometry(sf::st_geometry(lux_sf))
+
+grid_data_intersection <- sf_grid_id %>%
+  sf::st_intersection(lux_sf_dummy)
+
+
+#first try:
 grid_data_intersection <- sf_grid %>%
   dplyr::mutate(cellID = 1:nrow(.)) %>%
-  sf::st_intersection(lux_sf %>% select("NAME_2"))
+  sf::st_intersection(lux_sf %>% select(NAME_2))
 
-plot(test)
+plot(grid_data_intersection)
 
 shared_area <- grid_data_intersection %>%
   mutate(shared_area = sf::st_area(sf::st_geometry(.)) %>% as.numeric(), .before = 1)
