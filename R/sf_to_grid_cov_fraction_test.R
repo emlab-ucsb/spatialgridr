@@ -41,6 +41,10 @@ exactextractr::coverage_fraction(r, lux_sf |> dplyr::select("POP")) |> rast() |>
 
 #sf to sf grid
 
+lux_sf <- sf::st_read(system.file("ex/lux.shp", package="terra"))
+
+r <- rast(lux_sf, ncol = 75, nrow = 100)
+
 #sf categorical to grid
 sf_grid <- sf::st_as_sf(as.polygons(r, dissolve = FALSE))
 
@@ -61,11 +65,16 @@ grouping_col <- "NAME_2"
 sf_grid_id <- sf_grid %>%
   dplyr::mutate(cellID = 1:nrow(.))
 
+
+sf_grid_area <- sf_grid_id %>%
+  dplyr::mutate(area_cell = as.numeric(sf::st_area(.))) %>%
+  sf::st_drop_geometry()
+
 intersected_data <- lux_sf %>%
   dplyr::group_by(.data[[grouping_col]]) %>%
   dplyr::summarise() %>%
   split(seq(nrow(.))) %>%
-  lapply(function(x) sf::st_intersection(sf_grid_id, x))
+  lapply(function(x) sf::st_intersection(sf_grid_id, x) %>% dplyr::mutate(area = as.numeric(sf::st_area(.))) %>% sf::st_drop_geometry(.) %>% full_join(sf_grid_area, ., by = c("cellID")) %>% dplyr::mutate(perc_area = area/area_cell, .keep = "unused") %>% dplyr::left_join(sf_grid_id, .,  by = "cellID"))
 
 lux_sf_dummy <- lux_sf %>%
   dplyr::select(dplyr::all_of(grouping_col)) %>%
