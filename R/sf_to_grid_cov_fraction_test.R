@@ -1,55 +1,125 @@
-library(terra)
-library(dplyr)
-
 #expanding the usage cases for sf to raster and sf to sf grids to cover classified sf objects and continuous sf objects
 
-lux_sf <- sf::st_read(system.file("ex/lux.shp", package="terra"))
+data_sf <- sf::st_read(system.file("ex/lux.shp", package="terra"))
 
-r <- rast(lux_sf, ncol = 75, nrow = 100)
+ras_grid <- terra::rast(data_sf, ncol = 75, nrow = 100)
 
-#classified sf object to raster grid
+sf_class_to_raster <- function(dat, spatial_grid, sf_col_name, cov_fraction){
+  #group same polygons together so we don't end up with many polygons of the same variable name
+  data_sf_dissolved <- dat %>%
+    dplyr::group_by(.data[[sf_col_name]]) %>%
+    dplyr::summarise() %>%
+    dplyr::ungroup()
 
-grouping_col <- "NAME_1"
+  data_sf_dissolved_names <- data_sf_dissolved[[sf_col_name]]
 
-#group same polygons together so we don't end up with many polygons of the same variable name
-lux_sf_dissolved <- lux_sf %>%
-  dplyr::group_by(.data[[grouping_col]]) %>%
-  dplyr::summarise()
 
-lux_sf_dissolved_names <- lux_sf_dissolved[[grouping_col]]
+ coverage_fractions_ras <- exactextractr::coverage_fraction(spatial_grid, data_sf_dissolved) |>
+    terra::rast() |>
+   setNames(data_sf_dissolved_names)
 
-#min % coverage of raster cell by sf polygon for it to be classified as that type
-coverage_fraction_threshold <- 0.5
+ thresholded_ras <- coverage_fractions_ras |>
+   terra::classify(matrix(c(0, cov_fraction, NA, coverage_fraction_threshold, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = TRUE)
 
-sf_to_raster_by_coverage_fraction <- exactextractr::coverage_fraction(r, lux_sf_dissolved) |> rast() |> classify(matrix(c(0, coverage_fraction_threshold, NA, coverage_fraction_threshold, 1, 1), ncol = 3, byrow = TRUE), include.lowest = TRUE) |> setNames(lux_sf_dissolved_names)
+ #define minimum total cell coverage that should be used to force cell classification
+ min_cov <- 0.95
+ total_cell_coverage <- coverage_fractions_ras %>%
+   sum(na.rm = TRUE) %>%
+   terra::classify(matrix(c(0, min_cov, NA, min_cov, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = TRUE)
 
-plot(sf_to_raster_by_coverage_fraction)
 
-plot(sum(sf_to_raster_by_coverage_fraction, na.rm = T))
+return(coverage_fractions_ras)
+}
+
+sf_to_raster_by_coverage_fraction <- sf_class_to_raster(dat = data_sf, spatial_grid = ras_grid, sf_col_name = "NAME_2", cov_fraction = 0.5)
+
+terra::plot(sf_to_raster_by_coverage_fraction)
+
+terra::plot(sum(sf_to_raster_by_coverage_fraction, na.rm = T))
+terra::lines(vect(data_sf))
+
+
+#currently, if multiple polygons intersect a cell and none of them hits the coverage fraction classification threshold, the cell ends up NA
+#want to change this to chose the cell value with the highest coverage where there is almost total coverage by the polygons
+
+
+
 
 #sf to raster for continuous sf objects - not needed
 
 grouping_col <- "POP"
 
-sf_to_raster_cont_values <- rasterize(vect(lux_sf), r,  field = grouping_col, fun = 'mean', cover=T)
+sf_to_raster_cont_values <- terra::asterize(vect(data_sf), r,  field = grouping_col, fun = 'mean', cover=T)
 
 plot(sf_to_raster_cont_values, type = "classes")
-lines(vect(lux_sf))
+lines(vect(data_sf))
 
 #using a coverage approach -would be possible, but would need to create a raster layer for each value in the sf object, so would potentially be memory heavy
-exactextractr::coverage_fraction(r, lux_sf |> dplyr::select("POP")) |> rast() |> plot()
+exactextractr::coverage_fraction(r, data_sf |> dplyr::select("POP")) |> rast() |> plot()
 
 #sf to sf grid
 
-lux_sf <- sf::st_read(system.file("ex/lux.shp", package="terra"))
 
-r <- rast(lux_sf, ncol = 75, nrow = 100)
+sf_class_to_sf <- function(dat, spatial_grid, sf_col_name, cov_fraction){
+
+  spatial_grid_with_id <- spatial_grid %>%
+    dplyr::mutate(cellID = 1:nrow(.))
+
+
+  spatial_grid_with_area <- spatial_grid_with_id %>%
+    dplyr::mutate(area_cell = as.numeric(sf::st_area(.))) %>%
+    sf::st_drop_geometry()
+
+  dat_grouped <- dat %>%
+    dplyr::group_by(.data[[sf_col_name]]) %>%
+    dplyr::summarise() %>%
+    dplyr::ungroup()
+
+  layer_names <- dat_grouped[[1]]
+
+  dat_list <- split(dat_grouped, layer_names)
+
+  intersected_data_list <- lapply(layer_names, function(x) dat_list[[x]] %>%
+                                    sf::st_intersection(spatial_grid_with_id, .) %>%
+                                    dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
+                                    sf::st_drop_geometry(.) %>%
+                                    dplyr::full_join(spatial_grid_with_area, ., by = c("cellID")) %>%
+                                    dplyr::mutate(perc_area = area / area_cell, .keep = "unused") %>%
+                                    dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
+                                    dplyr::mutate(
+                                      {{x}} := dplyr::case_when(perc_area >= cov_fraction  ~ 1,
+                                                         .default = 0),
+                                      .before = 1
+                                    ) %>%
+                                    dplyr::select(1))
+
+  lapply(intersected_data_list, sf::st_drop_geometry) %>%
+    do.call(cbind, .) %>%
+    sf::st_set_geometry(sf::st_geometry(intersected_data_list[[1]]))
+
+}
+
+data_sf <- sf::st_read(system.file("ex/lux.shp", package="terra"))
+
+r <- rast(data_sf, ncol = 75, nrow = 100)
 
 #sf categorical to grid
 sf_grid <- sf::st_as_sf(as.polygons(r, dissolve = FALSE))
 
-#current method
-presence_absence <- lux_sf %>%
+sf_to_sf_by_coverage_fraction <- sf_class_to_sf(dat = data_sf, spatial_grid = sf_grid, sf_col_name = "NAME_2", cov_fraction = 0.5)
+
+plot(sf_to_sf_by_coverage_fraction, border = F)
+
+sf_to_sf_by_coverage_fraction %>%
+  sf::st_drop_geometry() %>%
+  rowSums() %>%
+  as.data.frame() %>%
+  sf::st_set_geometry(sf::st_geometry(sf_to_sf_by_coverage_fraction)) %>%
+  plot()
+
+
+#current method - all intersected cells are classified
+presence_absence <- data_sf %>%
   sf::st_intersects(sf_grid, .) %>%
   {lengths(.)>0} %>%
   as.integer()
@@ -57,52 +127,3 @@ presence_absence <- lux_sf %>%
 sf_grid %>%
   dplyr::mutate(presence := presence_absence, .before = 1) %>%
   plot()
-
-#new approach
-
-grouping_col <- "NAME_2"
-
-sf_grid_id <- sf_grid %>%
-  dplyr::mutate(cellID = 1:nrow(.))
-
-
-sf_grid_area <- sf_grid_id %>%
-  dplyr::mutate(area_cell = as.numeric(sf::st_area(.))) %>%
-  sf::st_drop_geometry()
-
-intersected_data <- lux_sf %>%
-  dplyr::group_by(.data[[grouping_col]]) %>%
-  dplyr::summarise() %>%
-  split(seq(nrow(.))) %>%
-  lapply(function(x) sf::st_intersection(sf_grid_id, x) %>% dplyr::mutate(area = as.numeric(sf::st_area(.))) %>% sf::st_drop_geometry(.) %>% full_join(sf_grid_area, ., by = c("cellID")) %>% dplyr::mutate(perc_area = area/area_cell, .keep = "unused") %>% dplyr::left_join(sf_grid_id, .,  by = "cellID"))
-
-lux_sf_dummy <- lux_sf %>%
-  dplyr::select(dplyr::all_of(grouping_col)) %>%
-  model.matrix(formula(paste("~", grouping_col, "-1")), .) %>%
-  as.data.frame() %>%
-  setNames(lux_sf[[grouping_col]]) %>%
-  sf::st_set_geometry(sf::st_geometry(lux_sf))
-
-grid_data_intersection <- sf_grid_id %>%
-  sf::st_intersection(lux_sf_dummy)
-
-
-#first try:
-grid_data_intersection <- sf_grid %>%
-  dplyr::mutate(cellID = 1:nrow(.)) %>%
-  sf::st_intersection(lux_sf %>% select(NAME_2))
-
-plot(grid_data_intersection)
-
-shared_area <- grid_data_intersection %>%
-  mutate(shared_area = sf::st_area(sf::st_geometry(.)) %>% as.numeric(), .before = 1)
-
-grid_cell_areas <- sf_grid %>%
-  dplyr::mutate(cellID = 1:nrow(.)) %>%
-  mutate(area_cell = sf::st_area(sf::st_geometry(.)) %>% as.numeric(), .before = 1)
-
-grid_data_coverage <- grid_cell_areas %>%
-  dplyr::full_join(shared_area %>% sf::st_drop_geometry(), by = dplyr::join_by(cellID)) %>%
-  mutate(area_overlap = shared_area/area_cell, .keep = "unused")
-
-plot(grid_data_coverage["area_overlap"])
