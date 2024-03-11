@@ -49,7 +49,7 @@ get_grid <- function(area_polygon, projection_crs, option = "raster", resolution
       grid_intersect <- grid_out
     }
 
-    overlap <- sf::st_intersects(grid_centroids, area_polygon) %>%
+    overlap <- sf::st_intersects(grid_intersect, area_polygon) %>%
       lengths() > 0
     grid_out[overlap,] %>%
       dplyr::bind_cols(sf::st_coordinates(sf::st_centroid(.)) %>%
