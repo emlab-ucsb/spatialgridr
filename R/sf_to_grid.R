@@ -12,7 +12,7 @@
 #'
 #' @return `terra::rast()` or `sf` gridded data, depending on `spatial_grid` format
 #' @noRd
-sf_to_grid <- function(dat, spatial_grid, matching_crs, name, sf_col_layer_names, antimeridian){
+sf_to_grid <- function(dat, spatial_grid, matching_crs, name, sf_col_layer_names, antimeridian, cov_fraction, return_cov_frac){
 
   #1st option: the sf data object is polygons showing a single feature presence or sf_col_layer_names is names of each habitat/ species/ other feature
 
@@ -25,7 +25,9 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, sf_col_layer_names
       dplyr::mutate(sf_col_layer_names = 1, .before = 1)
   }  else {
     dat <- dat %>%
-      dplyr::select(dplyr::all_of(sf_col_layer_names))
+      dplyr::group_by(.data[[sf_col_layer_names]]) %>%
+      dplyr::summarise() %>%
+      dplyr::ungroup()
   }
 
   if(check_raster(spatial_grid)){
@@ -64,7 +66,7 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, sf_col_layer_names
         sf::st_shift_longitude() %>%
         sf::st_crop(p_grid) %>%
         sf::st_transform(sf::st_crs(spatial_grid)) %>%
-        sf::st_union() %>%
+        #sf::st_union() %>%
         sf::st_sf()
     }else{
       dat_cropped <- if(matching_crs) dat %>% sf::st_crop(spatial_grid) else{spatial_grid %>%
@@ -73,12 +75,48 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, sf_col_layer_names
           sf::st_transform(sf::st_crs(spatial_grid))}
 
     }
-    presence_absence <- dat_cropped %>%
-      sf::st_intersects(spatial_grid, .) %>%
-      {lengths(.)>0} %>%
-      as.integer()
+    if(is.null(sf_col_layer_names)){
+      presence_absence <- dat_cropped %>%
+        sf::st_intersects(spatial_grid, .) %>%
+        {lengths(.)>0} %>%
+        as.integer()
 
-    spatial_grid %>%
-      dplyr::mutate("{name}" := presence_absence, .before = 1)
+      spatial_grid %>%
+        dplyr::mutate("{name}" := presence_absence, .before = 1)
+    }else{ #this is for gridding sf data with multiple features
+      spatial_grid_with_id <- spatial_grid %>%
+        dplyr::mutate(cellID = 1:nrow(.))
+
+      spatial_grid_with_area <- spatial_grid_with_id %>%
+        dplyr::mutate(area_cell = as.numeric(sf::st_area(.))) %>%
+        sf::st_drop_geometry()
+
+      layer_names <- dat_cropped[[1]]
+
+      dat_list <- split(dat_cropped, layer_names)
+
+      intersected_data_list <- lapply(layer_names, function(x) dat_list[[x]] %>%
+                                        sf::st_intersection(spatial_grid_with_id, .) %>%
+                                        dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
+                                        sf::st_drop_geometry(.) %>%
+                                        dplyr::full_join(spatial_grid_with_area, ., by = c("cellID")) %>%
+                                        dplyr::mutate(perc_area = area / area_cell, .keep = "unused", .before = 1) %>%
+                                        dplyr::mutate(perc_area = dplyr::case_when(is.na(perc_area) ~ 0,
+                                                                                   .default = as.numeric(perc_area))) %>%
+                                        dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
+                                        dplyr::select(!cellID) %>%
+                                        {if(return_cov_frac) dplyr::select(., 1, {{x}} := 1) else {
+                                          dplyr::mutate(.,
+                                                        {{x}} := dplyr::case_when(perc_area >= cov_fraction  ~ 1,
+                                                                                  .default = 0),
+                                                        .before = 1
+                                          ) %>%
+                                            dplyr::select(1)
+                                        }})
+
+      lapply(intersected_data_list, sf::st_drop_geometry) %>%
+        do.call(cbind, .) %>%
+        sf::st_set_geometry(sf::st_geometry(intersected_data_list[[1]]))
+    }
   }
 }

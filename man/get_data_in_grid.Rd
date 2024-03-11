@@ -11,7 +11,9 @@ get_data_in_grid(
   meth = NULL,
   name = NULL,
   sf_col_layer_names = NULL,
-  antimeridian = NULL
+  antimeridian = NULL,
+  cov_fraction = 0.5,
+  return_cov_frac = FALSE
 )
 }
 \arguments{
@@ -25,12 +27,16 @@ get_data_in_grid(
 
 \item{name}{\code{character} to name the data output}
 
-\item{sf_col_layer_names}{\code{character} vector; name(s) of columns that contain the data to be gridded/ cropped in \code{sf} input data; defaults to first column}
+\item{sf_col_layer_names}{\code{character} vector; name(s) of columns that contain the data to be gridded/ cropped in \code{sf} input data. If NULL, \code{sf} data is assumed to represent a single features, e.g. one habitat or species.}
 
 \item{antimeridian}{\code{logical} can be set to true if the data to be extracted crosses the antimeridian and is in lon-lat (EPSG:4326) format. If set to \code{NULL} (default) the function will try to check if data spans the antimeridian and set this appropriately.}
+
+\item{cov_fraction}{\code{numeric} cover fraction value between 0 and 1; if sf data is input and gridded data is required (i.e. a \code{spatial_grid} is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type}
+
+\item{return_cov_frac}{\code{logical} used only if sf data is input and gridded data is required (i.e. a \code{spatial_grid} is provided). If \code{TRUE} will return an \code{sf} object with the \% coverage of each feature in each grid cell. \code{sf_col_layer_names} should be provided.}
 }
 \value{
-\code{sf} or \code{terra::rast()} object; cropped and intersected data in same format as \code{dat} if  an \code{area_polygon} is provided, otherwise \code{sf} or \code{terra::rast()} planning gridded data depending on the format of the planning grid provided
+\code{sf} or \code{terra::rast()} object; cropped and intersected data in same format as \code{dat} if  an \code{area_polygon} is provided, otherwise \code{sf} or \code{terra::rast()} gridded data depending on the format of the planning grid provided
 }
 \description{
 Get gridded or cropped data from input data
