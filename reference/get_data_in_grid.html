@@ -49,7 +49,9 @@
 <span>  meth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sf_col_layer_names <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  antimeridian <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  antimeridian <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cov_fraction <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  return_cov_frac <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -76,18 +78,26 @@
 
 
 <dt>sf_col_layer_names</dt>
-<dd><p><code>character</code> vector; name(s) of columns that contain the data to be gridded/ cropped in <code>sf</code> input data; defaults to first column</p></dd>
+<dd><p><code>character</code> vector; name(s) of columns that contain the data to be gridded/ cropped in <code>sf</code> input data. If NULL, <code>sf</code> data is assumed to represent a single features, e.g. one habitat or species.</p></dd>
 
 
 <dt>antimeridian</dt>
 <dd><p><code>logical</code> can be set to true if the data to be extracted crosses the antimeridian and is in lon-lat (EPSG:4326) format. If set to <code>NULL</code> (default) the function will try to check if data spans the antimeridian and set this appropriately.</p></dd>
+
+
+<dt>cov_fraction</dt>
+<dd><p><code>numeric</code> cover fraction value between 0 and 1; if sf data is input and gridded data is required (i.e. a <code>spatial_grid</code> is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type</p></dd>
+
+
+<dt>return_cov_frac</dt>
+<dd><p><code>logical</code> used only if sf data is input and gridded data is required (i.e. a <code>spatial_grid</code> is provided). If <code>TRUE</code> will return an <code>sf</code> object with the % coverage of each feature in each grid cell. <code>sf_col_layer_names</code> should be provided.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p><code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> object; cropped and intersected data in same format as <code>dat</code> if  an <code>area_polygon</code> is provided, otherwise <code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> planning gridded data depending on the format of the planning grid provided</p>
+<p><code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> object; cropped and intersected data in same format as <code>dat</code> if  an <code>area_polygon</code> is provided, otherwise <code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> gridded data depending on the format of the planning grid provided</p>
     </div>
 
     <div class="section level2">
