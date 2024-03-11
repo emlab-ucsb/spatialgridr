@@ -9,6 +9,7 @@
 #' @param projection_crs a suitable crs for the area of interest; for prioritization work, best practices is to use a local, equal area projection
 #' @param option the desired output format, either "raster", "sf_square" (vector), or "sf_hex" (vector); default is "raster"
 #' @param resolution numeric; the desired planning unit (grid cell) resolution in units (usually metres or degrees) of the projection_crs: `sf::st_crs(projection_crs, parameters = TRUE)$units_gdal`
+#' @param sf_method string; should the planning unit be returned based on the `"centroid"` of the planning unit falling within the area_polygon, or any `"overlap"` of the planning unit with the area_polygon. `"overlap"` will be significantly slower.
 #'
 #' @return A `terra::rast()` of `sf` planning grid of the same resolution and crs provided
 #' @export
@@ -21,7 +22,7 @@
 #' # Create a planning grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `projection_crs`.
 #' planning_grid <- get_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
 
-get_grid <- function(area_polygon, projection_crs, option = "raster", resolution = 5000){
+get_grid <- function(area_polygon, projection_crs, option = "raster", resolution = 5000, sf_method = "centroid"){
 
   # Add repeated errors for area_polygon
   if(!check_sf(area_polygon)) {
@@ -42,9 +43,13 @@ get_grid <- function(area_polygon, projection_crs, option = "raster", resolution
   } else{
     grid_out <- if(option == "sf_square") sf::st_make_grid(area_polygon, cellsize = resolution, square = TRUE) %>% sf::st_as_sf() else sf::st_make_grid(area_polygon, cellsize = resolution, square = FALSE) %>% sf::st_as_sf()
 
-    grid_centroids <- sf::st_centroid(grid_out)
+    if (sf_method == "centroid"){
+      grid_intersect <- sf::st_centroid(grid_out)
+    } else if (sf_method == "overlap"){
+      grid_intersect <- grid_out
+    }
 
-    overlap <- sf::st_intersects(grid_centroids, area_polygon) %>%
+    overlap <- sf::st_intersects(grid_intersect, area_polygon) %>%
       lengths() > 0
     grid_out[overlap,] %>%
       dplyr::bind_cols(sf::st_coordinates(sf::st_centroid(.)) %>%

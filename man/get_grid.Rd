@@ -4,7 +4,13 @@
 \alias{get_grid}
 \title{Create a planning grid raster for an area of interest}
 \usage{
-get_grid(area_polygon, projection_crs, option = "raster", resolution = 5000)
+get_grid(
+  area_polygon,
+  projection_crs,
+  option = "raster",
+  resolution = 5000,
+  sf_method = "centroid"
+)
 }
 \arguments{
 \item{area_polygon}{an sf polygon or multipolygon object of the area of interest (e.g., a country's EEZ)}
@@ -14,6 +20,8 @@ get_grid(area_polygon, projection_crs, option = "raster", resolution = 5000)
 \item{option}{the desired output format, either "raster", "sf_square" (vector), or "sf_hex" (vector); default is "raster"}
 
 \item{resolution}{numeric; the desired planning unit (grid cell) resolution in units (usually metres or degrees) of the projection_crs: \code{sf::st_crs(projection_crs, parameters = TRUE)$units_gdal}}
+
+\item{sf_method}{string; should the planning unit be returned based on the \code{"centroid"} of the planning unit falling within the area_polygon, or any \code{"overlap"} of the planning unit with the area_polygon. \code{"overlap"} will be significantly slower.}
 }
 \value{
 A \code{terra::rast()} of \code{sf} planning grid of the same resolution and crs provided
