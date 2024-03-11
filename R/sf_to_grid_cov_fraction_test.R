@@ -1,5 +1,5 @@
 #expanding the usage cases for sf to raster and sf to sf grids to cover classified sf objects and continuous sf objects
-
+library(magrittr)
 data_sf <- sf::st_read(system.file("ex/lux.shp", package="terra"))
 
 ras_grid <- terra::rast(data_sf, ncol = 75, nrow = 100)
@@ -19,24 +19,25 @@ sf_class_to_raster <- function(dat, spatial_grid, sf_col_name, cov_fraction){
    setNames(data_sf_dissolved_names)
 
  thresholded_ras <- coverage_fractions_ras |>
-   terra::classify(matrix(c(0, cov_fraction, NA, coverage_fraction_threshold, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = TRUE)
+   terra::classify(matrix(c(0, cov_fraction, NA, cov_fraction, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = TRUE)
 
  #define minimum total cell coverage that should be used to force cell classification
  min_cov <- 0.95
- total_cell_coverage <- coverage_fractions_ras %>%
+
+ total_cell_coverage_ras <- coverage_fractions_ras %>%
    sum(na.rm = TRUE) %>%
-   terra::classify(matrix(c(0, min_cov, NA, min_cov, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = TRUE)
+   terra::classify(matrix(c(0, cov_fraction, NA, cov_fraction, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = TRUE)
 
 
-return(coverage_fractions_ras)
+return(c(sum(thresholded_ras, na.rm = TRUE), total_cell_coverage_ras))
 }
 
-sf_to_raster_by_coverage_fraction <- sf_class_to_raster(dat = data_sf, spatial_grid = ras_grid, sf_col_name = "NAME_2", cov_fraction = 0.5)
+sf_to_raster_by_coverage_fraction <- sf_class_to_raster(dat = data_sf, spatial_grid = ras_grid, sf_col_name = "NAME_2", cov_fraction = 0.7)
 
 terra::plot(sf_to_raster_by_coverage_fraction)
 
-terra::plot(sum(sf_to_raster_by_coverage_fraction, na.rm = T))
-terra::lines(vect(data_sf))
+terra::plot(sum(sf_to_raster_by_coverage_fraction, na.rm = T), col = rainbow(n=3))
+terra::lines(terra::vect(data_sf))
 
 
 #currently, if multiple polygons intersect a cell and none of them hits the coverage fraction classification threshold, the cell ends up NA
