@@ -48,10 +48,10 @@
 <span>  dat <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  meth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sf_col_layer_names <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  antimeridian <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cov_fraction <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  return_cov_frac <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  cutoff <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  apply_cutoff <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -74,23 +74,23 @@
 
 
 <dt>name</dt>
-<dd><p><code>character</code> to name the data output</p></dd>
+<dd><p><code>character</code> to name the data output; unless <code>group_by</code> is supplied, in which case that column is used as the feature names</p></dd>
 
 
-<dt>sf_col_layer_names</dt>
-<dd><p><code>character</code> vector; name(s) of columns that contain the data to be gridded/ cropped in <code>sf</code> input data. If NULL, <code>sf</code> data is assumed to represent a single features, e.g. one habitat or species.</p></dd>
+<dt>group_by</dt>
+<dd><p><code>character</code> (<code>sf</code> data only) column name that will be used for grouping of input data. If NULL, <code>sf</code> data is assumed to represent a single features, e.g. one habitat or species.</p></dd>
 
 
 <dt>antimeridian</dt>
 <dd><p><code>logical</code> can be set to true if the data to be extracted crosses the antimeridian and is in lon-lat (EPSG:4326) format. If set to <code>NULL</code> (default) the function will try to check if data spans the antimeridian and set this appropriately.</p></dd>
 
 
-<dt>cov_fraction</dt>
-<dd><p><code>numeric</code> cover fraction value between 0 and 1; if sf data is input and gridded data is required (i.e. a <code>spatial_grid</code> is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type</p></dd>
+<dt>cutoff</dt>
+<dd><p><code>numeric</code> (<code>sf</code> data only) cover fraction value between 0 and 1; if gridded output is required (i.e. a <code>spatial_grid</code> is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type</p></dd>
 
 
-<dt>return_cov_frac</dt>
-<dd><p><code>logical</code> used only if sf data is input and gridded data is required (i.e. a <code>spatial_grid</code> is provided). If <code>TRUE</code> will return an <code>sf</code> object with the % coverage of each feature in each grid cell. <code>sf_col_layer_names</code> should be provided.</p></dd>
+<dt>apply_cutoff</dt>
+<dd><p><code>logical</code> (<code>sf</code> data only) if gridded output is required (i.e. a <code>spatial_grid</code> is provided), <code>FALSE</code> will return an <code>sf</code> object with the % coverage of each feature in each grid cell, as opposed to a binary presence/ absence. <code>group_by</code> should be provided.</p></dd>
 
 </dl></div>
     <div class="section level2">
