@@ -10,10 +10,10 @@ get_data_in_grid(
   dat = NULL,
   meth = NULL,
   name = NULL,
-  sf_col_layer_names = NULL,
+  group_by = NULL,
   antimeridian = NULL,
-  cov_fraction = 0.5,
-  return_cov_frac = FALSE
+  cutoff = 0.5,
+  apply_cutoff = TRUE
 )
 }
 \arguments{
@@ -25,15 +25,15 @@ get_data_in_grid(
 
 \item{meth}{\code{character} method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as \code{exactextractr::exact_extract()} is used for gridding to sf planning grid, whereas \code{terra::project()}/\code{terra::resample()} is used for transforming/ gridding raster data.}
 
-\item{name}{\code{character} to name the data output}
+\item{name}{\code{character} to name the data output; unless \code{group_by} is supplied, in which case that column is used as the feature names}
 
-\item{sf_col_layer_names}{\code{character} vector; name(s) of columns that contain the data to be gridded/ cropped in \code{sf} input data. If NULL, \code{sf} data is assumed to represent a single features, e.g. one habitat or species.}
+\item{group_by}{\code{character} (\code{sf} data only) column name that will be used for grouping of input data. If NULL, \code{sf} data is assumed to represent a single features, e.g. one habitat or species.}
 
 \item{antimeridian}{\code{logical} can be set to true if the data to be extracted crosses the antimeridian and is in lon-lat (EPSG:4326) format. If set to \code{NULL} (default) the function will try to check if data spans the antimeridian and set this appropriately.}
 
-\item{cov_fraction}{\code{numeric} cover fraction value between 0 and 1; if sf data is input and gridded data is required (i.e. a \code{spatial_grid} is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type}
+\item{cutoff}{\code{numeric} (\code{sf} data only) cover fraction value between 0 and 1; if gridded output is required (i.e. a \code{spatial_grid} is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type}
 
-\item{return_cov_frac}{\code{logical} used only if sf data is input and gridded data is required (i.e. a \code{spatial_grid} is provided). If \code{TRUE} will return an \code{sf} object with the \% coverage of each feature in each grid cell. \code{sf_col_layer_names} should be provided.}
+\item{apply_cutoff}{\code{logical} (\code{sf} data only) if gridded output is required (i.e. a \code{spatial_grid} is provided), \code{FALSE} will return an \code{sf} object with the \% coverage of each feature in each grid cell, as opposed to a binary presence/ absence. \code{group_by} should be provided.}
 }
 \value{
 \code{sf} or \code{terra::rast()} object; cropped and intersected data in same format as \code{dat} if  an \code{area_polygon} is provided, otherwise \code{sf} or \code{terra::rast()} gridded data depending on the format of the planning grid provided

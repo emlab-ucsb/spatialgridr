@@ -4,12 +4,12 @@
 #' @param spatial_grid `sf` or `terra::rast()` planning grid
 #' @param dat `sf` or `terra::rast()` data to be gridded/ cropped
 #' @param meth `character` method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as `exactextractr::exact_extract()` is used for gridding to sf planning grid, whereas `terra::project()`/`terra::resample()` is used for transforming/ gridding raster data.
-#' @param name `character` to name the data output
-#' @param sf_col_layer_names `character` vector; name(s) of columns that contain the data to be gridded/ cropped in `sf` input data. If NULL, `sf` data is assumed to represent a single features, e.g. one habitat or species.
+#' @param name `character` to name the data output; unless `group_by` is supplied, in which case that column is used as the feature names
+#' @param group_by `character` (`sf` data only) column name that will be used for grouping of input data. If NULL, `sf` data is assumed to represent a single features, e.g. one habitat or species.
 #' @param antimeridian `logical` can be set to true if the data to be extracted crosses the antimeridian and is in lon-lat (EPSG:4326) format. If set to `NULL` (default) the function will try to check if data spans the antimeridian and set this appropriately.
-#' @param cov_fraction `numeric` cover fraction value between 0 and 1; if sf data is input and gridded data is required (i.e. a `spatial_grid` is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type
+#' @param cutoff `numeric` (`sf` data only) cover fraction value between 0 and 1; if gridded output is required (i.e. a `spatial_grid` is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type
 #'
-#' @param return_cov_frac `logical` used only if sf data is input and gridded data is required (i.e. a `spatial_grid` is provided). If `TRUE` will return an `sf` object with the % coverage of each feature in each grid cell. `sf_col_layer_names` should be provided.
+#' @param apply_cutoff `logical` (`sf` data only) if gridded output is required (i.e. a `spatial_grid` is provided), `FALSE` will return an `sf` object with the % coverage of each feature in each grid cell, as opposed to a binary presence/ absence. `group_by` should be provided.
 #'
 #' @return `sf` or `terra::rast()` object; cropped and intersected data in same format as `dat` if  an `area_polygon` is provided, otherwise `sf` or `terra::rast()` gridded data depending on the format of the planning grid provided
 #'
@@ -34,7 +34,7 @@
 #' cold_coral <- system.file("extdata", "cold_coral.tif", package = "spatialgridr") |> terra::rast()
 #' coral_gridded <- get_data_in_grid(spatial_grid = planning_grid, dat = cold_coral)
 #' terra::plot(coral_gridded)
-get_data_in_grid <- function(area_polygon = NULL, spatial_grid = NULL, dat = NULL, meth = NULL, name = NULL, sf_col_layer_names = NULL, antimeridian = NULL, cov_fraction = 0.5, return_cov_frac = FALSE){
+get_data_in_grid <- function(area_polygon = NULL, spatial_grid = NULL, dat = NULL, meth = NULL, name = NULL, group_by = NULL, antimeridian = NULL, cutoff = 0.5, apply_cutoff = TRUE){
   if(is.null(dat)){
     stop("Please provide some input data")
   }
@@ -78,7 +78,7 @@ get_data_in_grid <- function(area_polygon = NULL, spatial_grid = NULL, dat = NUL
   } else if(check_raster(dat)){
     ras_to_grid(dat, spatial_grid, matching_crs, meth, name, antimeridian)
     } else {
-    sf_to_grid(dat, spatial_grid, matching_crs, name, sf_col_layer_names, antimeridian, cov_fraction, return_cov_frac)
+    sf_to_grid(dat, spatial_grid, matching_crs, name, group_by, antimeridian, cutoff, apply_cutoff)
   }
 
 }
