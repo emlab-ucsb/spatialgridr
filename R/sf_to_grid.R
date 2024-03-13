@@ -7,12 +7,12 @@
 #' @param spatial_grid `terra::rast()` or `sf` planning grid
 #' @param matching_crs `logical` TRUE if crs of data and planning grid match, else FASE
 #' @param name `string` name of returned raster or if sf, column name in sf object
-#' @param group_by `string` names of columns in sf data that will be gridded
+#' @param feature_names `string` names of columns in sf data that will be gridded
 #' @param antimeridian `logical` TRUE if data to be gridded cross the antimeridian
 #'
 #' @return `terra::rast()` or `sf` gridded data, depending on `spatial_grid` format
 #' @noRd
-sf_to_grid <- function(dat, spatial_grid, matching_crs, name, group_by, antimeridian, cutoff, apply_cutoff){
+sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, antimeridian, cutoff, apply_cutoff){
 
   if(is.null(name)) name <- "data"
 
@@ -36,7 +36,7 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, group_by, antimeri
         {if(antimeridian) sf::st_union(.) %>% sf::st_sf() else .}
     }
       dat_cropped %>%
-        terra::rasterize(spatial_grid, field = 1, by = group_by) %>%
+        terra::rasterize(spatial_grid, field = 1, by = feature_names) %>%
         terra::mask(spatial_grid) %>%
         stats::setNames(name)
 
@@ -62,14 +62,14 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, group_by, antimeri
 
     }
 
-    if(is.null(group_by)){
+    if(is.null(feature_names)){
       dat_cropped <- dat_cropped %>%
         sf::st_geometry() %>%
         sf::st_sf() %>%
         dplyr::mutate({{name}} := 1, .before = 1)
     }  else {
       dat_cropped <- dat_cropped %>%
-        dplyr::group_by(.data[[group_by]]) %>%
+        dplyr::group_by(.data[[feature_names]]) %>%
         dplyr::summarise() %>%
         dplyr::ungroup()
     }
@@ -81,9 +81,9 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, group_by, antimeri
       dplyr::mutate(area_cell = as.numeric(sf::st_area(.))) %>%
       sf::st_drop_geometry()
 
-      layer_names <- if(is.null(group_by)) name else dat_cropped[[1]]
+      layer_names <- if(is.null(feature_names)) name else dat_cropped[[1]]
 
-      dat_list <- if(is.null(group_by)) list(dat_cropped) %>% setNames(layer_names) else split(dat_cropped, layer_names)
+      dat_list <- if(is.null(feature_names)) list(dat_cropped) %>% setNames(layer_names) else split(dat_cropped, layer_names)
 
       intersected_data_list <- lapply(layer_names, function(x) dat_list[[x]] %>%
                                         sf::st_intersection(spatial_grid_with_id, .) %>%

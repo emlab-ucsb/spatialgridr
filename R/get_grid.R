@@ -32,7 +32,7 @@ get_grid <- function(area_polygon, projection_crs, option = "raster", resolution
 
   area_polygon <- area_polygon %>%
     sf::st_geometry() %>%
-    sf::st_as_sf() %>%
+    sf::st_sf() %>%
     {if(sf::st_crs(area_polygon) == projection_crs) . else sf::st_transform(., projection_crs)}
 
   if(option == "raster") {
@@ -41,7 +41,7 @@ get_grid <- function(area_polygon, projection_crs, option = "raster", resolution
       terra::rasterize(area_polygon, ., touches=FALSE, field = 1)
 
   } else{
-    grid_out <- if(option == "sf_square") sf::st_make_grid(area_polygon, cellsize = resolution, square = TRUE) %>% sf::st_as_sf() else sf::st_make_grid(area_polygon, cellsize = resolution, square = FALSE) %>% sf::st_as_sf()
+    grid_out <- if(option == "sf_square") sf::st_make_grid(area_polygon, cellsize = resolution, square = TRUE) %>% sf::st_sf() else sf::st_make_grid(area_polygon, cellsize = resolution, square = FALSE) %>% sf::st_sf()
 
     if (sf_method == "centroid"){
       grid_intersect <- sf::st_centroid(grid_out)
