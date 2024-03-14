@@ -64,9 +64,10 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
 
     if(is.null(feature_names)){
       dat_cropped <- dat_cropped %>%
-        sf::st_geometry() %>%
-        sf::st_sf() %>%
-        dplyr::mutate({{name}} := 1, .before = 1)
+        dplyr::mutate({{name}} := 1, .before = 1) %>%
+        dplyr::group_by({{name}}) %>%
+        dplyr::summarise() %>%
+        dplyr::ungroup()
     }  else {
       dat_cropped <- dat_cropped %>%
         dplyr::group_by(.data[[feature_names]]) %>%
