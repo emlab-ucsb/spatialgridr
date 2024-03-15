@@ -16,8 +16,8 @@
 #' @export
 #'
 #' @examples
-#' # knolls data for area of Pacific
-#' knolls <- system.file("extdata", "ridges.rds", package = "spatialgridr") |> readRDS()
+#' # ridges data for area of Pacific
+#' ridges <- system.file("extdata", "ridges.rds", package = "spatialgridr") |> readRDS()
 #' # an area of interest, in this case Samoa's Exclusive Economic Zone
 #' samoa_eez <- system.file("extdata", "samoa_eez.rds", package = "spatialgridr") |> readRDS()
 #'
@@ -26,9 +26,9 @@
 #'
 #' # Create a planning grid with 5km sized planning units
 #' planning_grid <- get_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
-#' # Get knolls data, which is vector data in sf format, in the planning grid
-#' knolls_gridded <- get_data_in_grid(spatial_grid = planning_grid, dat = knolls)
-#' terra::plot(knolls_gridded)
+#' # Get ridges data, which is vector data in sf format, in the planning grid
+#' ridges_gridded <- get_data_in_grid(spatial_grid = planning_grid, dat = ridges)
+#' terra::plot(ridges_gridded)
 #'
 #' #Get some raster data on cold water corals for the same planning grid
 #' cold_coral <- system.file("extdata", "cold_coral.tif", package = "spatialgridr") |> terra::rast()

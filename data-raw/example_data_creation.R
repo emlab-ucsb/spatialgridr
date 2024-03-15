@@ -26,11 +26,11 @@ lhs_polygon <- poly_samoa_kir |>
 rhs_polygon <- poly_samoa_kir |>
   sf::st_crop(xmin = -180, ymin = as.numeric(sf::st_bbox(poly_samoa_kir)$ymin), xmax = 0, ymax = as.numeric(sf::st_bbox(poly_samoa_kir)$ymax))
 
-#get knolls base polygon extent just for extent of the Samoa and Kiribati EEZs
-knolls <- system.file("extdata/geomorphology", "Ridges.rds", package = "oceandatr", mustWork = TRUE) |>
+#get ridges base polygon extent just for extent of the Samoa and Kiribati EEZs
+ridges <- system.file("extdata/geomorphology", "Ridges.rds", package = "oceandatr", mustWork = TRUE) |>
   readRDS()
 
-rbind(sf::st_crop(knolls, lhs_polygon), sf::st_crop(knolls, rhs_polygon)) |>
+rbind(sf::st_crop(ridges, lhs_polygon), sf::st_crop(ridges, rhs_polygon)) |>
   saveRDS("inst/extdata/ridges.rds")
 
 #get some coral data

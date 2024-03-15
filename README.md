@@ -71,18 +71,18 @@ plot(planning_grid_sf)
 <img src="man/figures/README-grid_sf-1.png" width="100%" />
 
 Now we can grid some data. Data can be in raster (`terra::rast()`) or
-`sf` format. Here’s an example using global data mapping knolls (small
-seamounts) which is in `sf` format:
+`sf` format. Here’s an example using global data mapping ridges which is
+in `sf` format:
 
 ``` r
-# knolls data for area of Pacific
-knolls <- readRDS(system.file("extdata", "ridges.rds", package = "spatialgridr"))
+# ridges data for area of Pacific
+ridges <- readRDS(system.file("extdata", "ridges.rds", package = "spatialgridr"))
 
 #grid the data
-knolls_gridded <- get_data_in_grid(spatial_grid = planning_grid, dat = knolls)
+ridges_gridded <- get_data_in_grid(spatial_grid = planning_grid, dat = ridges)
 
 #plot
-terra::plot(knolls_gridded)
+terra::plot(ridges_gridded)
 terra::lines(samoa_eez |> sf::st_transform(crs = samoa_projection)) #add Samoa's EEZ
 ```
 
@@ -109,10 +109,10 @@ We can also use the sf grid we created to return data in sf format:
 
 ``` r
 #grid the data
-knolls_gridded_sf <- get_data_in_grid(spatial_grid = planning_grid_sf, dat = knolls)
+ridges_gridded_sf <- get_data_in_grid(spatial_grid = planning_grid_sf, dat = ridges)
 
 #plot
-plot(knolls_gridded_sf)
+plot(ridges_gridded_sf)
 ```
 
 <img src="man/figures/README-grid_sf_to_sf-1.png" width="100%" />
