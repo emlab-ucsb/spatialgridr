@@ -91,14 +91,14 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
                                         dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
                                         sf::st_drop_geometry(.) %>%
                                         dplyr::full_join(spatial_grid_with_area, ., by = c("cellID")) %>%
-                                        dplyr::mutate(perc_area = area / area_cell, .keep = "unused", .before = 1) %>%
-                                        dplyr::mutate(perc_area = dplyr::case_when(is.na(perc_area) ~ 0,
-                                                                                   .default = as.numeric(perc_area))) %>%
+                                        dplyr::mutate(perc_area = .data$area / .data$area_cell, .keep = "unused", .before = 1) %>%
+                                        dplyr::mutate(perc_area = dplyr::case_when(is.na(.data$perc_area) ~ 0,
+                                                                                   .default = as.numeric(.data$perc_area))) %>%
                                         dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
-                                        dplyr::select(!cellID) %>%
+                                        dplyr::select(!.data$cellID) %>%
                                         {if(!apply_cutoff) dplyr::select(., 1, {{x}} := 1) else {
                                           dplyr::mutate(.,
-                                                        {{x}} := dplyr::case_when(perc_area >= cutoff  ~ 1,
+                                                        {{x}} := dplyr::case_when(.data$perc_area >= cutoff  ~ 1,
                                                                                   .default = 0)
                                           ) %>%
                                             dplyr::select({{x}})
