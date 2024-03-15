@@ -106,16 +106,16 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">planning_grid_sf</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-grid_sf-1.png" width="100%"></p>
-<p>Now we can grid some data. Data can be in raster (<code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code>) or <code>sf</code> format. Here’s an example using global data mapping knolls (small seamounts) which is in <code>sf</code> format:</p>
+<p>Now we can grid some data. Data can be in raster (<code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code>) or <code>sf</code> format. Here’s an example using global data mapping ridges which is in <code>sf</code> format:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># knolls data for area of Pacific</span></span>
-<span><span class="va">knolls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ridges.rds"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># ridges data for area of Pacific</span></span>
+<span><span class="va">ridges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ridges.rds"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#grid the data</span></span>
-<span><span class="va">knolls_gridded</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_data_in_grid.html">get_data_in_grid</a></span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">planning_grid</span>, dat <span class="op">=</span> <span class="va">knolls</span><span class="op">)</span></span>
+<span><span class="va">ridges_gridded</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_data_in_grid.html">get_data_in_grid</a></span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">planning_grid</span>, dat <span class="op">=</span> <span class="va">ridges</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#plot</span></span>
-<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">knolls_gridded</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ridges_gridded</span><span class="op">)</span></span>
 <span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">samoa_eez</span> <span class="op">|&gt;</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">samoa_projection</span><span class="op">)</span><span class="op">)</span> <span class="co">#add Samoa's EEZ</span></span></code></pre></div>
 <p><img src="reference/figures/README-grid_sf_data-1.png" width="100%"></p>
 <p>And another example using raster data, in this case global cold water coral distribution data which has been pre-cropped to the Pacific</p>
@@ -133,10 +133,10 @@
 <p>We can also use the sf grid we created to return data in sf format:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#grid the data</span></span>
-<span><span class="va">knolls_gridded_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_data_in_grid.html">get_data_in_grid</a></span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">planning_grid_sf</span>, dat <span class="op">=</span> <span class="va">knolls</span><span class="op">)</span></span>
+<span><span class="va">ridges_gridded_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_data_in_grid.html">get_data_in_grid</a></span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">planning_grid_sf</span>, dat <span class="op">=</span> <span class="va">ridges</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#plot</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">knolls_gridded_sf</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ridges_gridded_sf</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-grid_sf_to_sf-1.png" width="100%"></p>
 </div>
 </div>
