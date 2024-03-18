@@ -39,3 +39,12 @@ system.file("extdata/binary_grid_figure7.tif", package = "oceandatr", mustWork =
   terra::rast() |>
   terra::crop(poly_samoa_kir) |>
   terra::writeRaster("inst/extdata/cold_coral.tif", gdal = c("COMPRESS=ZSTD", "PREDICTOR=2", "ZSTD_LEVEL=22", "NUM_THREADS=10"), datatype = "INT1U")
+
+#2024-3-18 added multi-layer sf data example
+abyssal_plains <- sf::st_read(file.path("extdata/geomorphology/Abyssal_Classification.shp"))
+
+sf::sf_use_s2(FALSE)
+rbind(sf::st_crop(abyssal_plains, lhs_polygon), sf::st_crop(abyssal_plains, rhs_polygon)) |>
+  sf::st_cast(to = "MULTIPOLYGON") |>
+  saveRDS("inst/extdata/abyssal_plains.rds")
+sf::sf_use_s2(TRUE)

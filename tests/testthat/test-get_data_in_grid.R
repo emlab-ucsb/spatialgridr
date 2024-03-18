@@ -32,3 +32,14 @@ test_that("returns kiribati example (antimeridian example) of gridded data - sf"
                   class = "sf")
 
 })
+
+test_that("returns samoa example of multi-column sf gridded data - sf", {
+  expect_s3_class(suppressWarnings(get_data_in_grid(spatial_grid = get_grid(area_polygon = readRDS(system.file("extdata", "samoa_eez.rds", package = "spatialgridr")),
+                                                    projection_crs = '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs',
+                                                    resolution = 5000,
+                                                    option = "sf_square"),
+                                                    dat = readRDS(system.file("extdata", "abyssal_plains.rds", package = "spatialgridr")),
+                                                    feature_names = "Class")),
+                  class = "sf")
+
+})
