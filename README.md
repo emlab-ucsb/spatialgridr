@@ -116,3 +116,25 @@ plot(ridges_gridded_sf)
 ```
 
 <img src="man/figures/README-grid_sf_to_sf-1.png" width="100%" />
+
+Finally, we can also grid `sf` data that contains multiple data
+features, such as habitat types. To do this, we provide the name of the
+column that as the `feature_names` argument in
+`get_data_data_in_grid()`. This creates a multi-layer grid. For raster
+data this means multiple raster layers and for `sf` grids multi-column
+objects. Here’s an example using `sf` data that classifies the worlds
+deep oceans (Abyssal plains) into 3 categories:
+
+``` r
+#load the data
+abyssal_plains <- system.file("extdata", "abyssal_plains.rds", package = "spatialgridr") |>
+  readRDS()
+
+#grid the data
+abyssal_plains_sf <- get_data_in_grid(spatial_grid = planning_grid_sf, dat = abyssal_plains, feature_names = "Class")
+
+#plot
+plot(abyssal_plains_sf)
+```
+
+<img src="man/figures/README-grid_multi_sf-1.png" width="100%" />
