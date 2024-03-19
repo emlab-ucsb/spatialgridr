@@ -14,18 +14,33 @@
 #' @noRd
 sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, antimeridian, cutoff, apply_cutoff){
 
-  if(is.null(name)) name <- "data"
+    if(is.null(feature_names)){
+      if(is.null(name)) name <- "data"
+
+    dat_grouped <- dat %>%
+      dplyr::mutate({{name}} := 1, .before = 1) %>%
+      dplyr::group_by({{name}}) %>%
+      dplyr::summarise() %>%
+      dplyr::ungroup()
+  }  else {
+    dat_grouped <- dat%>%
+      dplyr::group_by(.data[[feature_names]]) %>%
+      dplyr::summarise() %>%
+      dplyr::ungroup()
+  }
 
   if(check_raster(spatial_grid)){
 
-    if(matching_crs) dat_cropped <- dat else{
+    nms <- dat_grouped[[1]]
+
+    if(matching_crs) dat_cropped <- dat_grouped else{
       p_grid <- spatial_grid %>%
         terra::as.polygons() %>%
         sf::st_as_sf() %>%
-        sf::st_transform(sf::st_crs(dat)) %>%
+        sf::st_transform(sf::st_crs(dat_grouped)) %>%
         {if(antimeridian) sf::st_shift_longitude(.) else .}
 
-      dat_cropped <- dat %>%
+      dat_cropped <- dat_grouped %>%
         {if(antimeridian & !unique(sf::st_geometry_type(.)) %in% c("POINT", "MULTIPOINT")) {
           sf::st_break_antimeridian(., lon_0 = 180) %>% sf::st_shift_longitude()}
           else if(antimeridian & unique(sf::st_geometry_type(.)) %in% c("POINT", "MULTIPOINT")){
@@ -35,10 +50,11 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
         sf::st_transform(sf::st_crs(spatial_grid)) %>%
         {if(antimeridian) sf::st_union(.) %>% sf::st_sf() else .}
     }
-      dat_cropped %>%
-        terra::rasterize(spatial_grid, field = 1, by = feature_names) %>%
-        terra::mask(spatial_grid) %>%
-        stats::setNames(name)
+
+    exactextractr::coverage_fraction(spatial_grid, dat_cropped) %>%
+      terra::rast() %>%
+      setNames(nms) %>%
+      {if(apply_cutoff) terra::classify(., matrix(c(-1, cutoff, NA, cutoff, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = FALSE, right = FALSE) else .}
 
   } else{ #this is for sf planning grid output
     if(antimeridian & (sf::st_crs(dat) == sf::st_crs(4326))){
@@ -60,19 +76,6 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
           sf::st_crop(dat, .) %>%
           sf::st_transform(sf::st_crs(spatial_grid))}
 
-    }
-
-    if(is.null(feature_names)){
-      dat_cropped <- dat_cropped %>%
-        dplyr::mutate({{name}} := 1, .before = 1) %>%
-        dplyr::group_by({{name}}) %>%
-        dplyr::summarise() %>%
-        dplyr::ungroup()
-    }  else {
-      dat_cropped <- dat_cropped %>%
-        dplyr::group_by(.data[[feature_names]]) %>%
-        dplyr::summarise() %>%
-        dplyr::ungroup()
     }
 
     spatial_grid_with_id <- spatial_grid %>%
