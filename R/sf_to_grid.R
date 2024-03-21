@@ -57,7 +57,9 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
     exactextractr::coverage_fraction(spatial_grid, dat_grouped) %>%
       terra::rast() %>%
       setNames(nms) %>%
-      {if(apply_cutoff) terra::classify(., matrix(c(-1, cutoff, NA, cutoff, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = FALSE, right = FALSE) else .}
+      terra::mask(spatial_grid) %>%
+      {if(apply_cutoff) terra::classify(., matrix(c(-1, cutoff, NA, cutoff, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = FALSE, right = FALSE) else .} %>%
+      .[[lapply(., function(x) !all(terra::values(x) == 0)) %>% unlist()]] #removes all zero layers and by default also all NA layers
   } else{
 
     spatial_grid_with_id <- spatial_grid %>%
@@ -67,11 +69,12 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
       dplyr::mutate(area_cell = as.numeric(sf::st_area(.))) %>%
       sf::st_drop_geometry()
 
-    layer_names <- if(is.null(feature_names)) name else dat_cropped[[1]]
+    layer_names <- if(is.null(feature_names)) name else dat_grouped[[1]]
 
-    dat_list <- if(is.null(feature_names)) list(dat_cropped) %>% setNames(layer_names) else split(dat_cropped, layer_names)
+    dat_list <- if(is.null(feature_names)) list(dat_grouped) %>% setNames(layer_names) else split(dat_grouped, layer_names)
 
-    intersected_data_list <- lapply(layer_names, function(x) dat_list[[x]] %>%
+    intersected_data_list <- suppressWarnings(
+                                  lapply(layer_names, function(x) dat_list[[x]] %>%
                                       sf::st_intersection(spatial_grid_with_id, .) %>%
                                       dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
                                       sf::st_drop_geometry(.) %>%
@@ -87,9 +90,10 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
                                                                                 .default = 0)
                                         ) %>%
                                           dplyr::select({{x}})
-                                      }})
+                                        }})
+    )
 
-    lapply(intersected_data_list, sf::st_drop_geometry) %>%
+    lapply(intersected_data_list, function(x) sf::st_drop_geometry(x) %>% dplyr::select(dplyr::where(~any(. != 0)))) %>%
       do.call(cbind, .) %>%
       sf::st_set_geometry(sf::st_geometry(intersected_data_list[[1]])) %>%
       sf::st_set_geometry("geometry")

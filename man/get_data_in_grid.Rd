@@ -29,7 +29,7 @@ get_data_in_grid(
 
 \item{feature_names}{\code{character} (\code{sf} data only) column with feature names that will be used for grouping of input data. If NULL, \code{sf} data is assumed to represent a single features, e.g. one habitat or species.}
 
-\item{antimeridian}{\code{logical} can be set to true if the data to be extracted crosses the antimeridian and is in lon-lat (EPSG:4326) format. If set to \code{NULL} (default) the function will try to check if data spans the antimeridian and set this appropriately.}
+\item{antimeridian}{\code{logical} can be set to true if the \code{area_polygon} or \code{spatial_grid} for which data will be extracted crosses the antimeridian and the data source is in lon-lat (EPSG:4326) format. If set to \code{NULL} (default) the function will try to check if the antimeridian is crossed and set this appropriately. Note that if you are using an \code{area_polygon} or \code{spatial_grid} that crosses the antimeridian and have data that is not in lon-lat}
 
 \item{cutoff}{\code{numeric} (\code{sf} data only) cover fraction value between 0 and 1; if gridded output is required (i.e. a \code{spatial_grid} is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type}
 
