@@ -43,7 +43,7 @@ check_matching_crs <- function(area_polygon, spatial_grid, dat){
 #'
 #' @return `logical` TRUE if it does span the antimeridian, FALSE if it doesn't
 #' @noRd
-check_antimeridian <- function(sf_object){
+check_antimeridian <- function(sf_object, dat){
   if(sf::st_crs(sf_object) != sf::st_crs(4326)){
     b_box <- sf::st_transform(sf_object, 4326) %>%
       sf::st_bbox()
@@ -51,11 +51,12 @@ check_antimeridian <- function(sf_object){
     b_box <- sf::st_bbox(sf_object)
   }
 
-  if(round(b_box$xmin) == -180 & round(b_box$xmax) == 180){
+  if(round(b_box$xmin) == -180 & round(b_box$xmax) == 180 & sf::st_crs(dat) == sf::st_crs(4326)){
     TRUE
-  } else{
+  } else if (round(b_box$xmin) == -180 & round(b_box$xmax) == 180 & sf::st_crs(dat) != sf::st_crs(4326)){
+    message("Your area polygon or grid crosses the antimeridian, but your data are not in long-lat (EPSG 4326) format. This may result in problems when cropping and gridding data, if the data are not in a suitable local projection.")
     FALSE
-  }
+  } else FALSE
 }
 
 #' Check if data is a raster

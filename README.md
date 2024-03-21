@@ -117,13 +117,13 @@ plot(ridges_gridded_sf)
 
 <img src="man/figures/README-grid_sf_to_sf-1.png" width="100%" />
 
-Finally, we can also grid `sf` data that contains multiple data
-features, such as habitat types. To do this, we provide the name of the
-column that as the `feature_names` argument in
-`get_data_data_in_grid()`. This creates a multi-layer grid. For raster
-data this means multiple raster layers and for `sf` grids multi-column
-objects. Here’s an example using `sf` data that classifies the worlds
-deep oceans (Abyssal plains) into 3 categories:
+We can also grid `sf` data that contains multiple data features, such as
+habitat types. To do this, we provide the name of the column that as the
+`feature_names` argument in `get_data_data_in_grid()`. This creates a
+multi-layer grid. For raster data this means multiple raster layers and
+for `sf` grids multi-column objects. Here’s an example using `sf` data
+that classifies the worlds deep oceans (Abyssal plains) into 3
+categories:
 
 ``` r
 #load the data
@@ -138,3 +138,44 @@ plot(abyssal_plains_sf)
 ```
 
 <img src="man/figures/README-grid_multi_sf-1.png" width="100%" />
+
+`spatialgridr` also works with grids that cross the antimeridian
+(international date line). You can set `antimeridian = TRUE` in
+`get_data_in_grid` if you know you are using a grid that crosses the
+antimeridian, or if `antimeridian = NULL`, the function will
+automatically determine if the grid crosses the antimeridian. Here’s an
+example using Kiribati’s EEZ as the grid area.
+
+``` r
+#load the Kiribati EEZ polygon
+kir_eez <- system.file("extdata", "kir_eez.rds", package = "spatialgridr") |>
+  readRDS()
+
+#create a grid for the Kiribati EEZ - Equal area projection obtained from https://projectionwizard.org
+kir_grid <- get_grid(area_polygon = kir_eez, projection_crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 20000, option = "sf_square")
+
+#get abyssal plains classification for Kiribati grid
+kir_abyssal_plains <- get_data_in_grid(spatial_grid = kir_grid, dat = abyssal_plains, feature_names = "Class")
+#> Spherical geometry (s2) switched off
+#> although coordinates are longitude/latitude, st_intersection assumes that they
+#> are planar
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+#> Spherical geometry (s2) switched on
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+
+#plot
+plot(kir_abyssal_plains, border = FALSE)
+```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />

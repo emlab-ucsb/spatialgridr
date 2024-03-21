@@ -14,66 +14,53 @@
 #' @noRd
 sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, antimeridian, cutoff, apply_cutoff){
 
-  if(is.null(name)) name <- "data"
+  is_raster <- check_raster(spatial_grid)
 
-  if(check_raster(spatial_grid)){
+  if(matching_crs) {
+    dat_cropped <- dat %>%
+      sf::st_crop(spatial_grid)
+  } else{
+    grid_temp <- spatial_grid %>%
+      {if(is_raster) terra::as.polygons(.) %>% sf::st_as_sf() else .} %>%
+    sf::st_geometry() %>%
+      sf::st_transform(sf::st_crs(dat)) %>%
+      {if(antimeridian) sf::st_shift_longitude(.) else .}
 
-    if(matching_crs) dat_cropped <- dat else{
-      p_grid <- spatial_grid %>%
-        terra::as.polygons() %>%
-        sf::st_as_sf() %>%
-        sf::st_transform(sf::st_crs(dat)) %>%
-        {if(antimeridian) sf::st_shift_longitude(.) else .}
+    dat_cropped <- dat %>%
+      {if(antimeridian & !unique(sf::st_geometry_type(.)) %in% c("POINT", "MULTIPOINT")) {
+        sf::st_break_antimeridian(., lon_0 = 180) %>% sf::st_shift_longitude()}
+        else if(antimeridian & unique(sf::st_geometry_type(.)) %in% c("POINT", "MULTIPOINT")){
+          sf::st_shift_longitude(.)} else .} %>%
+      sf::st_crop(grid_temp) %>%
+      sf::st_transform(sf::st_crs(spatial_grid))
+  }
 
-      dat_cropped <- dat %>%
-        {if(antimeridian & !unique(sf::st_geometry_type(.)) %in% c("POINT", "MULTIPOINT")) {
-          sf::st_break_antimeridian(., lon_0 = 180) %>% sf::st_shift_longitude()}
-          else if(antimeridian & unique(sf::st_geometry_type(.)) %in% c("POINT", "MULTIPOINT")){
-            sf::st_shift_longitude(.)
-          } else .} %>%
-        sf::st_crop(p_grid) %>%
-        sf::st_transform(sf::st_crs(spatial_grid)) %>%
-        {if(antimeridian) sf::st_union(.) %>% sf::st_sf() else .}
-    }
-      dat_cropped %>%
-        terra::rasterize(spatial_grid, field = 1, by = feature_names) %>%
-        terra::mask(spatial_grid) %>%
-        stats::setNames(name)
+  if(is.null(feature_names)){
+    if(is.null(name)) name <- "data"
 
-  } else{ #this is for sf planning grid output
-    if(antimeridian & (sf::st_crs(dat) == sf::st_crs(4326))){
-      p_grid <- spatial_grid %>%
-        sf::st_geometry() %>%
-        sf::st_transform(sf::st_crs(dat)) %>%
-        sf::st_shift_longitude()
+    dat_grouped <- dat_cropped %>%
+      dplyr::mutate({{name}} := 1, .before = 1) %>%
+      dplyr::group_by({{name}}) %>%
+      dplyr::summarise() %>%
+      dplyr::ungroup()
 
-      dat_cropped <- dat %>%
-        {if(!unique(sf::st_geometry_type(.)) %in% c("POINT", "MULTIPOINT")) sf::st_break_antimeridian(., lon_0 = 180) else .} %>%
-        sf::st_shift_longitude() %>%
-        sf::st_crop(p_grid) %>%
-        sf::st_transform(sf::st_crs(spatial_grid)) %>%
-        #sf::st_union() %>%
-        sf::st_sf()
-    }else{
-      dat_cropped <- if(matching_crs) dat %>% sf::st_crop(spatial_grid) else{spatial_grid %>%
-          sf::st_transform(sf::st_crs(dat)) %>%
-          sf::st_crop(dat, .) %>%
-          sf::st_transform(sf::st_crs(spatial_grid))}
+  }  else {
+    dat_grouped <- dat_cropped %>%
+      dplyr::group_by(.data[[feature_names]]) %>%
+      dplyr::summarise() %>%
+      dplyr::ungroup()
+  }
 
-    }
+  if(is_raster){
+    nms <- dat_grouped[[1]]
 
-    if(is.null(feature_names)){
-      dat_cropped <- dat_cropped %>%
-        dplyr::mutate({{name}} := 1, .before = 1) %>%
-        dplyr::group_by({{name}}) %>%
-        dplyr::summarise() %>%
-        dplyr::ungroup()
-    }  else {
-      dat_cropped <- dat_cropped %>%
-        dplyr::group_by(.data[[feature_names]]) %>%
-        dplyr::summarise() %>%
-        dplyr::ungroup()
-    }
+    exactextractr::coverage_fraction(spatial_grid, dat_grouped) %>%
+      terra::rast() %>%
+      setNames(nms) %>%
+      terra::mask(spatial_grid) %>%
+      {if(apply_cutoff) terra::classify(., matrix(c(-1, cutoff, NA, cutoff, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = FALSE, right = FALSE) else .} %>%
+      .[[lapply(., function(x) !all(terra::values(x) == 0)) %>% unlist()]] #removes all zero layers and by default also all NA layers
+  } else{
 
     spatial_grid_with_id <- spatial_grid %>%
       dplyr::mutate(cellID = 1:nrow(.))
@@ -82,32 +69,33 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
       dplyr::mutate(area_cell = as.numeric(sf::st_area(.))) %>%
       sf::st_drop_geometry()
 
-      layer_names <- if(is.null(feature_names)) name else dat_cropped[[1]]
+    layer_names <- if(is.null(feature_names)) name else dat_grouped[[1]]
 
-      dat_list <- if(is.null(feature_names)) list(dat_cropped) %>% setNames(layer_names) else split(dat_cropped, layer_names)
+    dat_list <- if(is.null(feature_names)) list(dat_grouped) %>% setNames(layer_names) else split(dat_grouped, layer_names)
 
-      intersected_data_list <- lapply(layer_names, function(x) dat_list[[x]] %>%
-                                        sf::st_intersection(spatial_grid_with_id, .) %>%
-                                        dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
-                                        sf::st_drop_geometry(.) %>%
-                                        dplyr::full_join(spatial_grid_with_area, ., by = c("cellID")) %>%
-                                        dplyr::mutate(perc_area = .data$area / .data$area_cell, .keep = "unused", .before = 1) %>%
-                                        dplyr::mutate(perc_area = dplyr::case_when(is.na(.data$perc_area) ~ 0,
-                                                                                   .default = as.numeric(.data$perc_area))) %>%
-                                        dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
-                                        dplyr::select(!.data$cellID) %>%
-                                        {if(!apply_cutoff) dplyr::select(., 1, {{x}} := 1) else {
-                                          dplyr::mutate(.,
-                                                        {{x}} := dplyr::case_when(.data$perc_area >= cutoff  ~ 1,
-                                                                                  .default = 0)
-                                          ) %>%
-                                            dplyr::select({{x}})
+    intersected_data_list <- suppressWarnings(
+                                  lapply(layer_names, function(x) dat_list[[x]] %>%
+                                      sf::st_intersection(spatial_grid_with_id, .) %>%
+                                      dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
+                                      sf::st_drop_geometry(.) %>%
+                                      dplyr::full_join(spatial_grid_with_area, ., by = c("cellID")) %>%
+                                      dplyr::mutate(perc_area = .data$area / .data$area_cell, .keep = "unused", .before = 1) %>%
+                                      dplyr::mutate(perc_area = dplyr::case_when(is.na(.data$perc_area) ~ 0,
+                                                                                 .default = as.numeric(.data$perc_area))) %>%
+                                      dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
+                                      dplyr::select(!.data$cellID) %>%
+                                      {if(!apply_cutoff) dplyr::select(., 1, {{x}} := 1) else {
+                                        dplyr::mutate(.,
+                                                      {{x}} := dplyr::case_when(.data$perc_area >= cutoff  ~ 1,
+                                                                                .default = 0)
+                                        ) %>%
+                                          dplyr::select({{x}})
                                         }})
+    )
 
-      lapply(intersected_data_list, sf::st_drop_geometry) %>%
-        do.call(cbind, .) %>%
-        sf::st_set_geometry(sf::st_geometry(intersected_data_list[[1]])) %>%
-        sf::st_set_geometry("geometry")
-
+    lapply(intersected_data_list, function(x) sf::st_drop_geometry(x) %>% dplyr::select(dplyr::where(~any(. != 0)))) %>%
+      do.call(cbind, .) %>%
+      sf::st_set_geometry(sf::st_geometry(intersected_data_list[[1]])) %>%
+      sf::st_set_geometry("geometry")
   }
-}
+  }

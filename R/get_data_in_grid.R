@@ -6,7 +6,7 @@
 #' @param meth `character` method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as `exactextractr::exact_extract()` is used for gridding to sf planning grid, whereas `terra::project()`/`terra::resample()` is used for transforming/ gridding raster data.
 #' @param name `character` to name the data output; unless `feature_names` is supplied, in which case that column is used as the feature names
 #' @param feature_names `character` (`sf` data only) column with feature names that will be used for grouping of input data. If NULL, `sf` data is assumed to represent a single features, e.g. one habitat or species.
-#' @param antimeridian `logical` can be set to true if the data to be extracted crosses the antimeridian and is in lon-lat (EPSG:4326) format. If set to `NULL` (default) the function will try to check if data spans the antimeridian and set this appropriately.
+#' @param antimeridian `logical` can be set to true if the `area_polygon` or `spatial_grid` for which data will be extracted crosses the antimeridian and the data source is in lon-lat (EPSG:4326) format. If set to `NULL` (default) the function will try to check if the antimeridian is crossed and set this appropriately. Note that if you are using an `area_polygon` or `spatial_grid` that crosses the antimeridian and have data that is not in lon-lat
 #' @param cutoff `numeric` (`sf` data only) cover fraction value between 0 and 1; if gridded output is required (i.e. a `spatial_grid` is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type
 #'
 #' @param apply_cutoff `logical` (`sf` data only) if gridded output is required (i.e. a `spatial_grid` is provided), `FALSE` will return an `sf` object with the % coverage of each feature in each grid cell, as opposed to a binary presence/ absence. `feature_names` should be provided.
@@ -48,7 +48,7 @@ get_data_in_grid <- function(area_polygon = NULL, spatial_grid = NULL, dat = NUL
     sf_object <- if(is.null(spatial_grid)) area_polygon else{
       if(check_sf(spatial_grid)) spatial_grid else terra::as.polygons(spatial_grid) %>% sf::st_as_sf()
     }
-    check_antimeridian(sf_object)
+    check_antimeridian(sf_object, dat)
   } else antimeridian
 
 #setting method for resampling, projecting, etc. a raster - should be 'near' for binary raster otherwise end up with non-binary values
