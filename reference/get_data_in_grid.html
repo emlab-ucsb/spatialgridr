@@ -82,7 +82,7 @@
 
 
 <dt>antimeridian</dt>
-<dd><p><code>logical</code> can be set to true if the data to be extracted crosses the antimeridian and is in lon-lat (EPSG:4326) format. If set to <code>NULL</code> (default) the function will try to check if data spans the antimeridian and set this appropriately.</p></dd>
+<dd><p><code>logical</code> can be set to true if the <code>area_polygon</code> or <code>spatial_grid</code> for which data will be extracted crosses the antimeridian and the data source is in lon-lat (EPSG:4326) format. If set to <code>NULL</code> (default) the function will try to check if the antimeridian is crossed and set this appropriately. Note that if you are using an <code>area_polygon</code> or <code>spatial_grid</code> that crosses the antimeridian and have data that is not in lon-lat</p></dd>
 
 
 <dt>cutoff</dt>
