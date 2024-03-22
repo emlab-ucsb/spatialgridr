@@ -42,13 +42,15 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
       dplyr::mutate({{name}} := 1, .before = 1) %>%
       dplyr::group_by({{name}}) %>%
       dplyr::summarise() %>%
-      dplyr::ungroup()
+      dplyr::ungroup() %>%
+      {if(sf::st_geometry_type(., by_geometry = FALSE) == "GEOMETRY") sf::st_cast(., to = "MULTIPOLYGON") else .}
 
   }  else {
     dat_grouped <- dat_cropped %>%
       dplyr::group_by(.data[[feature_names]]) %>%
       dplyr::summarise() %>%
-      dplyr::ungroup()
+      dplyr::ungroup() %>%
+      {if(sf::st_geometry_type(., by_geometry = FALSE) == "GEOMETRY") sf::st_cast(., to = "MULTIPOLYGON") else .}
   }
 
   if(is_raster){
