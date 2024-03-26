@@ -38,28 +38,29 @@ ras_to_grid <- function(dat, spatial_grid, matching_crs, meth, name, antimeridia
             stats::setNames(name)
     }
   } else {
-    if(antimeridian){
-      p_grid <- sf::st_geometry(spatial_grid) %>%
+    grid_has_extra_cols <- if(ncol(spatial_grid)>1) TRUE else FALSE
+
+    if(grid_has_extra_cols) extra_cols <- sf::st_drop_geometry(spatial_grid)
+
+
+    temp_grid <- if(matching_crs){
+      spatial_grid %>%
+        sf::st_geometry()
+    }  else {
+      spatial_grid %>%
+        sf::st_geometry() %>%
         sf::st_transform(sf::st_crs(dat)) %>%
-        sf::st_shift_longitude()
-
-      dat %>%
-        terra::rotate(left = FALSE) %>%
-        exactextractr::exact_extract(p_grid, meth , force_df = TRUE) %>%
-        stats::setNames(name) %>%
-        data.frame(p_grid, .) %>%
-        sf::st_sf() %>%
-        sf::st_transform(., sf::st_crs(spatial_grid))
-
-    }else{
-      p_grid <- if(matching_crs) sf::st_geometry(spatial_grid) else sf::st_transform(sf::st_geometry(spatial_grid), sf::st_crs(dat))
-
-      dat %>%
-        exactextractr::exact_extract(p_grid, meth , force_df = TRUE) %>%
-        stats::setNames(name) %>%
-        data.frame(p_grid, .) %>%
-        sf::st_sf() %>%
-        {if(matching_crs) . else sf::st_transform(., sf::st_crs(spatial_grid))}
+        {if(antimeridian) sf::st_shift_longitude(.) else .}
     }
+
+    dat %>%
+      {if(antimeridian) terra::rotate(., left = FALSE) else .}%>%
+      exactextractr::exact_extract(temp_grid, meth , force_df = TRUE) %>%
+      stats::setNames(name) %>%
+      data.frame(temp_grid, .) %>%
+      sf::st_sf() %>%
+      {if(matching_crs) . else sf::st_transform(., sf::st_crs(spatial_grid))} %>%
+      {if(grid_has_extra_cols) cbind(., extra_cols) %>% dplyr::select(colnames(extra_cols), name) else .} %>%
+      sf::st_set_geometry("geometry")
   }
 }
