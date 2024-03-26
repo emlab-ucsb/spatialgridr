@@ -91,7 +91,7 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
                                       dplyr::mutate(perc_area = dplyr::case_when(is.na(.data$perc_area) ~ 0,
                                                                                  .default = as.numeric(.data$perc_area))) %>%
                                       dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
-                                      {if(!apply_cutoff) dplyr::select(., perc_area, {{x}} := perc_area) else {
+                                      {if(!apply_cutoff) dplyr::select(., .data$perc_area, {{x}} := .data$perc_area) else {
                                         dplyr::mutate(.,
                                                       {{x}} := dplyr::case_when(.data$perc_area >= cutoff  ~ 1,
                                                                                 .default = 0)
