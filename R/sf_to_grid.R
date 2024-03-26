@@ -64,7 +64,13 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
       .[[lapply(., function(x) !all(terra::values(x) == 0)) %>% unlist()]] #removes all zero layers and by default also all NA layers
   } else{
 
+    grid_has_extra_cols <- if(ncol(spatial_grid)>1) TRUE else FALSE
+
+    if(grid_has_extra_cols) extra_cols <- sf::st_drop_geometry(spatial_grid)
+
     spatial_grid_with_id <- spatial_grid %>%
+      sf::st_geometry() %>%
+      sf::st_sf() %>%
       dplyr::mutate(cellID = 1:nrow(.))
 
     spatial_grid_with_area <- spatial_grid_with_id %>%
@@ -85,8 +91,7 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
                                       dplyr::mutate(perc_area = dplyr::case_when(is.na(.data$perc_area) ~ 0,
                                                                                  .default = as.numeric(.data$perc_area))) %>%
                                       dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
-                                      dplyr::select(!.data$cellID) %>%
-                                      {if(!apply_cutoff) dplyr::select(., 1, {{x}} := 1) else {
+                                      {if(!apply_cutoff) dplyr::select(., perc_area, {{x}} := perc_area) else {
                                         dplyr::mutate(.,
                                                       {{x}} := dplyr::case_when(.data$perc_area >= cutoff  ~ 1,
                                                                                 .default = 0)
@@ -97,6 +102,7 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
 
     lapply(intersected_data_list, function(x) sf::st_drop_geometry(x) %>% dplyr::select(dplyr::where(~any(. != 0)))) %>%
       do.call(cbind, .) %>%
+      {if(grid_has_extra_cols) cbind(extra_cols, .) else .} %>%
       sf::st_set_geometry(sf::st_geometry(intersected_data_list[[1]])) %>%
       sf::st_set_geometry("geometry")
   }
