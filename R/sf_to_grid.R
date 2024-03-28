@@ -35,6 +35,8 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
       sf::st_transform(sf::st_crs(spatial_grid))
   }
 
+  if(nrow(dat_cropped) == 0) stop("No data in grid.")
+
   if(is.null(feature_names)){
     if(is.null(name)) name <- "data"
 
@@ -81,24 +83,31 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
 
     dat_list <- if(is.null(feature_names)) list(dat_grouped) %>% setNames(layer_names) else split(dat_grouped, layer_names)
 
-    intersected_data_list <- suppressWarnings(
-                                  lapply(layer_names, function(x) dat_list[[x]] %>%
-                                      sf::st_intersection(spatial_grid_with_id, .) %>%
-                                      dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
-                                      sf::st_drop_geometry(.) %>%
-                                      dplyr::full_join(spatial_grid_with_area, ., by = c("cellID")) %>%
-                                      dplyr::mutate(perc_area = .data$area / .data$area_cell, .keep = "unused", .before = 1) %>%
-                                      dplyr::mutate(perc_area = dplyr::case_when(is.na(.data$perc_area) ~ 0,
-                                                                                 .default = as.numeric(.data$perc_area))) %>%
-                                      dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
-                                      {if(!apply_cutoff) dplyr::select(., .data$perc_area, {{x}} := .data$perc_area) else {
-                                        dplyr::mutate(.,
-                                                      {{x}} := dplyr::case_when(.data$perc_area >= cutoff  ~ 1,
-                                                                                .default = 0)
-                                        ) %>%
-                                          dplyr::select({{x}})
-                                        }})
-    )
+    intersected_data_list <- list()
+
+    for (layer in layer_names) {
+      temp_intersection <- sf::st_intersection(spatial_grid_with_id, dat_list[[layer]])
+
+      if(nrow(temp_intersection)>0) {
+        intersected_data_list[[layer]] <- temp_intersection %>%
+          dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
+          sf::st_drop_geometry(.) %>%
+          dplyr::full_join(spatial_grid_with_area, ., by = c("cellID")) %>%
+          dplyr::mutate(perc_area = .data$area / .data$area_cell, .keep = "unused", .before = 1) %>%
+          dplyr::mutate(perc_area = dplyr::case_when(is.na(.data$perc_area) ~ 0,
+                                                     .default = as.numeric(.data$perc_area))) %>%
+          dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
+          {if(!apply_cutoff) dplyr::select(., .data$perc_area, {{layer}} := .data$perc_area) else {
+            dplyr::mutate(.,
+                          {{layer}} := dplyr::case_when(.data$perc_area >= cutoff  ~ 1,
+                                                    .default = 0)
+            ) %>%
+              dplyr::select({{layer}})
+          }}
+      }
+    }
+
+    if(length(intersected_data_list) == 0) stop("No data in grid")
 
     lapply(intersected_data_list, function(x) sf::st_drop_geometry(x) %>% dplyr::select(dplyr::where(~any(. != 0)))) %>%
       do.call(cbind, .) %>%
