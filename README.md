@@ -165,15 +165,6 @@ kir_abyssal_plains <- get_data_in_grid(spatial_grid = kir_grid, dat = abyssal_pl
 #> Warning: attribute variables are assumed to be spatially constant throughout
 #> all geometries
 
-#> Warning: attribute variables are assumed to be spatially constant throughout
-#> all geometries
-
-#> Warning: attribute variables are assumed to be spatially constant throughout
-#> all geometries
-
-#> Warning: attribute variables are assumed to be spatially constant throughout
-#> all geometries
-
 #plot
 plot(kir_abyssal_plains, border = FALSE)
 ```
