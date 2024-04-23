@@ -1,8 +1,8 @@
 pandoc: 3.1.11
-pkgdown: 2.0.7
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-03-28T06:29Z
+last_built: 2024-04-23T01:50Z
 urls:
   reference: https://emlab-ucsb.github.io/spatialgridr/reference
   article: https://emlab-ucsb.github.io/spatialgridr/articles
