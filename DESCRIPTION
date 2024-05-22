@@ -13,12 +13,20 @@ Imports:
     dplyr,
     exactextractr,
     magrittr,
+    remotes,
     rlang,
     sf,
     stats,
-    terra
+    terra,
+    utils
 Suggests: 
     codetools,
+    mregions2 (>= 1.0.0),
+    rnaturalearth,
+    rnaturalearthhires (>= 1.0.0.9000),
     testthat (>= 3.0.0)
 URL: https://emlab-ucsb.github.io/spatialgridr/
 Config/testthat/edition: 3
+Remotes: 
+    github::lifewatch/mregions2,
+    github::ropensci/rnaturalearthhires
