@@ -18,8 +18,8 @@
 #' @examples
 #' # ridges data for area of Pacific
 #' ridges <- system.file("extdata", "ridges.rds", package = "spatialgridr") |> readRDS()
-#' # use get_area() to get polygon of Samoa's Exclusive Economic Zone
-#' samoa_eez <- get_area(name = "Samoa")
+#' # use get_boundary() to get polygon of Samoa's Exclusive Economic Zone
+#' samoa_eez <- get_boundary(name = "Samoa")
 #'
 #' # You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
 #' samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'

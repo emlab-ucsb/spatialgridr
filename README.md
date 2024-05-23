@@ -25,7 +25,7 @@ remotes::install_github("emlab-ucsb/spatialgridr")
 
 `spatialgridr` has three functions:
 
-- `get_area()`: retrieves the boundaries for a marine or terrestrial
+- `get_boundary()`: retrieves the boundaries for a marine or terrestrial
   area, such as a country or Exclusive Economic Zone (EEZ)
 - `get_grid()`: creates a spatial grid
 - `get_data_in_grid()`: grids spatial data
@@ -49,7 +49,7 @@ planning, equal area projections are normally best.
 
 ``` r
 #get Samoa's EEZ
-samoa_eez <- get_area(name = "Samoa")
+samoa_eez <- get_boundary(name = "Samoa")
 
 plot(samoa_eez["geometry"], axes = TRUE)
 ```
@@ -161,7 +161,7 @@ example using Kiribati’s EEZ as the grid area.
 
 ``` r
 #load the Kiribati EEZ polygon
-kir_eez <- get_area(name = "Kiribati", country_type = "sovereign")
+kir_eez <- get_boundary(name = "Kiribati", country_type = "sovereign")
 
 #create a grid for the Kiribati EEZ - Equal area projection obtained from https://projectionwizard.org
 kir_grid <- get_grid(area_polygon = kir_eez, projection_crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 20000, option = "sf_square")

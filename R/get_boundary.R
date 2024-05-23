@@ -20,24 +20,24 @@
 #' @examples
 #' #Marine area examples:
 #' if(require("mregions2")){
-#'australia_mainland_eez <- get_area(name = "Australia")
+#'australia_mainland_eez <- get_boundary(name = "Australia")
 #'plot(australia_mainland_eez["geometry"])
 #'
 #'#this includes all islands that Australia has jurisdiction over:
-#'australia_including_territories_eez <- get_area(name = "Australia", country_type = "sovereign")
+#'australia_including_territories_eez <- get_boundary(name = "Australia", country_type = "sovereign")
 #'plot(australia_including_territories_eez["geometry"])
 #' }
 #'
 #'#Land area examples:
 #'if(require("rnaturalearth")){
-#'australia_land <- get_area(name = "Australia", type = "countries")
+#'australia_land <- get_boundary(name = "Australia", type = "countries")
 #'plot(australia_land["geometry"])
 #'
 #'#this includes all islands that Australia has jurisdiction over:
-#'australia_land_and_territories <- get_area(name = "Australia", type = "countries", country_type = "sovereign")
+#'australia_land_and_territories <- get_boundary(name = "Australia", type = "countries", country_type = "sovereign")
 #'plot(australia_land_and_territories["geometry"])
 #' }
-get_area <- function(name = "Australia", type = "eez", country_type = "country"){
+get_boundary <- function(name = "Australia", type = "eez", country_type = "country"){
   # initial query types: country, eez, ocean, 12nm, 24nm
 
   mregions_types <- c("eez", "12nm", "24nm", "ocean")
@@ -55,7 +55,7 @@ get_area <- function(name = "Australia", type = "eez", country_type = "country")
   if(!(country_type %in% country_types) & type != "ocean") stop(message = "'country_type' must be one of: ", paste(country_types, collapse = ", "))
 
   if(type %in% mregions_types){
-    rlang::check_installed("mregions2", reason = "to use `get_area()` to access marine areas", action = \(pkg, ...) remotes::install_github("lifewatch/mregions2"))
+    rlang::check_installed("mregions2", reason = "to use `get_boundary()` to access marine areas", action = \(pkg, ...) remotes::install_github("lifewatch/mregions2"))
     query_type <- mregions_types_lookup[which(mregions_types == type)]
 
     if(is.null(name)) {
@@ -75,8 +75,8 @@ get_area <- function(name = "Australia", type = "eez", country_type = "country")
 
     eval(parse(text = paste0("mregions2::mrp_get(\"", query_type, "\", cql_filter = \"", mregions_country_type, " = '", name, "'\")")))
   } else{
-    rlang::check_installed("rnaturalearth", reason = "to use `get_area()` to access land boundaries")
-    rlang::check_installed("rnaturalearthhires", reason = "to use `get_area()` to access marine areas", action = \(pkg, ...) remotes::install_github("ropensci/rnaturalearthhires"))
+    rlang::check_installed("rnaturalearth", reason = "to use `get_boundary()` to access land boundaries")
+    rlang::check_installed("rnaturalearthhires", reason = "to use `get_boundary()` to access marine areas", action = \(pkg, ...) remotes::install_github("ropensci/rnaturalearthhires"))
 
     rnaturalearth_country_type <- rnaturalearth_country_types_lookup[which(country_types == country_type)]
 

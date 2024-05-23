@@ -33,8 +33,8 @@ This function creates a planning grid for area of interest.
 This function uses \code{sf::st_make_grid()} to create an \code{sf} planning grid. The default ordering of this grid type is from bottom to top, left to right. In contrast, the planning grid resulting from a \code{raster} object is ordered from top to bottom, left to right. To preserve consistency across the data types, we have reordered the \code{sf} planning grid to also fill from top to bottom, left to right.
 }
 \examples{
-# use get_area() to get a polygon of Samoa's Exclusive Economic Zone
-samoa_eez <- get_area(name = "Samoa")
+# use get_boundary() to get a polygon of Samoa's Exclusive Economic Zone
+samoa_eez <- get_boundary(name = "Samoa")
 # You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 # Create a planning grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `projection_crs`.
