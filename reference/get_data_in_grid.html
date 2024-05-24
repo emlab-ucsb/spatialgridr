@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">spatialgridr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,7 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_data_in_grid</span><span class="op">(</span></span>
-<span>  area_polygon <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  boundary <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  spatial_grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  dat <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  meth <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -57,12 +57,12 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>area_polygon</dt>
-<dd><p><code>sf</code> polygon</p></dd>
+    <dl><dt>boundary</dt>
+<dd><p><code>sf</code> object with boundary of the area(s) you want gridded data for, e.g an EEZ or country. Boundaries can be obtained using <code><a href="get_boundary.html">get_boundary()</a></code></p></dd>
 
 
 <dt>spatial_grid</dt>
-<dd><p><code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> planning grid</p></dd>
+<dd><p><code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> grid created using <code><a href="get_grid.html">get_grid()</a></code></p></dd>
 
 
 <dt>dat</dt>
@@ -70,7 +70,7 @@
 
 
 <dt>meth</dt>
-<dd><p><code>character</code> method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as <code><a href="https://isciences.gitlab.io/exactextractr/reference/exact_extract.html" class="external-link">exactextractr::exact_extract()</a></code> is used for gridding to sf planning grid, whereas <code><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">terra::project()</a></code>/<code><a href="https://rspatial.github.io/terra/reference/resample.html" class="external-link">terra::resample()</a></code> is used for transforming/ gridding raster data.</p></dd>
+<dd><p><code>character</code> method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as <code><a href="https://isciences.gitlab.io/exactextractr/reference/exact_extract.html" class="external-link">exactextractr::exact_extract()</a></code> is used for gridding to sf spatial grid, whereas <code><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">terra::project()</a></code>/<code><a href="https://rspatial.github.io/terra/reference/resample.html" class="external-link">terra::resample()</a></code> is used for transforming/ gridding raster data.</p></dd>
 
 
 <dt>name</dt>
@@ -82,7 +82,7 @@
 
 
 <dt>antimeridian</dt>
-<dd><p><code>logical</code> can be set to true if the <code>area_polygon</code> or <code>spatial_grid</code> for which data will be extracted crosses the antimeridian and the data source is in lon-lat (EPSG:4326) format. If set to <code>NULL</code> (default) the function will try to check if the antimeridian is crossed and set this appropriately. Note that if you are using an <code>area_polygon</code> or <code>spatial_grid</code> that crosses the antimeridian and have data that is not in lon-lat</p></dd>
+<dd><p><code>logical</code> can be set to true if the <code>boundary</code> or <code>spatial_grid</code> for which data will be extracted crosses the antimeridian and the data source is in lon-lat (EPSG:4326) format. If set to <code>NULL</code> (default) the function will try to check if the antimeridian is crossed and set this appropriately. Note that if you are using an <code>boundary</code> or <code>spatial_grid</code> that crosses the antimeridian and have data that is not in lon-lat</p></dd>
 
 
 <dt>cutoff</dt>
@@ -97,30 +97,30 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p><code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> object; cropped and intersected data in same format as <code>dat</code> if  an <code>area_polygon</code> is provided, otherwise <code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> gridded data depending on the format of the planning grid provided</p>
+<p><code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> object; cropped and intersected data in same format as <code>dat</code> if  an <code>boundary</code> is provided, otherwise <code>sf</code> or <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> gridded data depending on the format of the spatial grid provided</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># ridges data for area of Pacific</span></span></span>
 <span class="r-in"><span><span class="va">ridges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ridges.rds"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># an area of interest, in this case Samoa's Exclusive Economic Zone</span></span></span>
-<span class="r-in"><span><span class="va">samoa_eez</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"samoa_eez.rds"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># use get_boundary() to get Samoa's Exclusive Economic Zone</span></span></span>
+<span class="r-in"><span><span class="va">samoa_eez</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_boundary.html">get_boundary</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Samoa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.</span></span></span>
+<span class="r-in"><span><span class="co"># You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. If you are doing spatial planning, equal area projections are normally best.</span></span></span>
 <span class="r-in"><span><span class="va">samoa_projection</span> <span class="op">&lt;-</span> <span class="st">'+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create a planning grid with 5km sized planning units</span></span></span>
-<span class="r-in"><span><span class="va">planning_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_grid.html">get_grid</a></span><span class="op">(</span>area_polygon <span class="op">=</span> <span class="va">samoa_eez</span>, projection_crs <span class="op">=</span> <span class="va">samoa_projection</span>, resolution <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Get ridges data, which is vector data in sf format, in the planning grid</span></span></span>
-<span class="r-in"><span><span class="va">ridges_gridded</span> <span class="op">&lt;-</span> <span class="fu">get_data_in_grid</span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">planning_grid</span>, dat <span class="op">=</span> <span class="va">ridges</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Create a spatial grid with 5km square cells</span></span></span>
+<span class="r-in"><span><span class="va">samoa_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_grid.html">get_grid</a></span><span class="op">(</span>boundary <span class="op">=</span> <span class="va">samoa_eez</span>, projection_crs <span class="op">=</span> <span class="va">samoa_projection</span>, resolution <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Get ridges data, which is vector data in sf format, in the spatial grid</span></span></span>
+<span class="r-in"><span><span class="va">ridges_gridded</span> <span class="op">&lt;-</span> <span class="fu">get_data_in_grid</span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">samoa_grid</span>, dat <span class="op">=</span> <span class="va">ridges</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>attribute variables are assumed to be spatially constant throughout all geometries</span>
 <span class="r-in"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ridges_gridded</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="get_data_in_grid-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">#Get some raster data on cold water corals for the same planning grid</span></span></span>
+<span class="r-in"><span><span class="co">#Get some raster data on cold water corals for the same spatial grid</span></span></span>
 <span class="r-in"><span><span class="va">cold_coral</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"cold_coral.tif"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">coral_gridded</span> <span class="op">&lt;-</span> <span class="fu">get_data_in_grid</span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">planning_grid</span>, dat <span class="op">=</span> <span class="va">cold_coral</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">coral_gridded</span> <span class="op">&lt;-</span> <span class="fu">get_data_in_grid</span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">samoa_grid</span>, dat <span class="op">=</span> <span class="va">cold_coral</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">coral_gridded</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="get_data_in_grid-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
