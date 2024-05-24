@@ -1,24 +1,24 @@
-#' Get polygon(s) for an area of interest
+#' Get boundaries for an area of interest
 #'
-#' Marine and land areas can be obtained.  For marine areas, the `mrp_get` function from the `mregions2` package is used to retrieve an area (e.g. an EEZ) from [Marine Regions](https://marineregions.org/gazetteer.php). For land areas, the package [`rnaturalearth`](https://github.com/ropensci/rnaturalearth/) is used.
+#' Marine and land boundaries can be obtained.  For marine boundaries, the `mrp_get` function from the `mregions2` package is used to retrieve the boundary (e.g. an EEZ) from [Marine Regions](https://marineregions.org/gazetteer.php). For land boundaries, the package [`rnaturalearth`](https://github.com/ropensci/rnaturalearth/) is used.
 #'
-#' @param name `character` name of the country or area. If `NULL` all areas are returned. If an incorrect `name` is input, a list of all possible names will be provided along with the error message.
-#' @param type `character` the area type. Can be one of:
-#' * `eez`: Exclusive Economic Zone (EEZ; 200nm), differ slightly from the the [UN Convention on the Law of the Sea (UNCLOS)](https://www.un.org/depts/los/convention_agreements/texts/unclos/part5.htm) definition because the archipelagic waters and the internal waters of a country are included
+#' @param name `character` name of the country or region. If `NULL` all boundaries of `type` are returned. If an incorrect `name` is input, the user is given a list of valid names to chose from.
+#' @param type `character` the boundary type. Can be one of:
+#' * `eez`: Exclusive Economic Zone (EEZ; 200nm). These EEZs differ slightly from the the [UN Convention on the Law of the Sea (UNCLOS)](https://www.un.org/depts/los/convention_agreements/texts/unclos/part5.htm) definition because the archipelagic waters and the internal waters of a country are included.
 #' * `12nm`: 12 nautical miles zone (Territorial Seas), defined in [UNCLOS](https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm)
 #' * `24nm`: 14 nautical miles zone (Contiguous Zone), defined in [UNCLOS](https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm)
 #' * `ocean`: Global Oceans and Seas as compiled by the Flanders Marine Data Centre. Names are: "Arctic Ocean", "Baltic Sea", "Indian Ocean", "Mediterranean Region", "North Atlantic Ocean", "North Pacific Ocean", "South Atlantic Ocean", "South China and Easter Archipelagic Seas", "South Pacific Ocean", and "Southern Ocean".
 #' * `countries`: country boundaries
 #'
-#' More details on the marine areas can be found on the [Marine Regions website](https://marineregions.org/sources.php), and for land area, the [Natural Earth website](https://www.naturalearthdata.com/features/). Note that this function retrieves data from Natural Earth at the highest resolution (1:10m).
+#' More details on the marine boundaries can be found on the [Marine Regions website](https://marineregions.org/sources.php), and for land boundaries, the [Natural Earth website](https://www.naturalearthdata.com/features/). Note that this function retrieves data from Natural Earth at the highest resolution (1:10m).
 #'
 #' @param country_type `character` must be either `country` or `sovereign`. Some countries have many territories that it has jurisdiction over. For example, Australia, France and the U.K. have jurisdiction over many overseas islands. Using `sovereign` returns the main country and all the territories, whereas using `country` returns just the main country. More details about what is a country via the `rnaturalearth` package [vignette](https://cran.r-project.org/web/packages/rnaturalearth/vignettes/what-is-a-country.html)
 #'
-#' @return 'sf' object of the area requested
+#' @return 'sf' polygon or multipolygon object of the boundary requested
 #' @export
 #'
 #' @examples
-#' #Marine area examples:
+#' #Marine boundary examples:
 #' if(require("mregions2")){
 #'australia_mainland_eez <- get_boundary(name = "Australia")
 #'plot(australia_mainland_eez["geometry"])
@@ -28,7 +28,7 @@
 #'plot(australia_including_territories_eez["geometry"])
 #' }
 #'
-#'#Land area examples:
+#'#Land boundary examples:
 #'if(require("rnaturalearth")){
 #'australia_land <- get_boundary(name = "Australia", type = "countries")
 #'plot(australia_land["geometry"])
@@ -55,11 +55,11 @@ get_boundary <- function(name = "Australia", type = "eez", country_type = "count
   if(!(country_type %in% country_types) & type != "ocean") stop(message = "'country_type' must be one of: ", paste(country_types, collapse = ", "))
 
   if(type %in% mregions_types){
-    rlang::check_installed("mregions2", reason = "to use `get_boundary()` to access marine areas", action = \(pkg, ...) remotes::install_github("lifewatch/mregions2"))
+    rlang::check_installed("mregions2", reason = "to use `get_boundary()` to access marine boundaries", action = \(pkg, ...) remotes::install_github("lifewatch/mregions2"))
     query_type <- mregions_types_lookup[which(mregions_types == type)]
 
     if(is.null(name)) {
-      message("You have requested all ", type, " areas, the download will take several minutes.")
+      message("You have requested all ", type, " boundaries, the download will take several minutes.")
       return(mregions2::mrp_get(query_type))
     }
     mregions_country_type <- ifelse(type == "ocean", "name", mregions_country_types_lookup[which(country_types == country_type)])
@@ -75,8 +75,8 @@ get_boundary <- function(name = "Australia", type = "eez", country_type = "count
 
     eval(parse(text = paste0("mregions2::mrp_get(\"", query_type, "\", cql_filter = \"", mregions_country_type, " = '", name, "'\")")))
   } else{
-    rlang::check_installed("rnaturalearth", reason = "to use `get_boundary()` to access land boundaries")
-    rlang::check_installed("rnaturalearthhires", reason = "to use `get_boundary()` to access marine areas", action = \(pkg, ...) remotes::install_github("ropensci/rnaturalearthhires"))
+    rlang::check_installed("rnaturalearth", reason = "to use `get_boundary()` to access land boundaries", action = \(pkg, ...) remotes::install_github("ropensci/rnaturalearth"))
+    rlang::check_installed("rnaturalearthhires", reason = "to use `get_boundary()` to access high resolution land boundaries", action = \(pkg, ...) remotes::install_github("ropensci/rnaturalearthhires"))
 
     rnaturalearth_country_type <- rnaturalearth_country_types_lookup[which(country_types == country_type)]
 
