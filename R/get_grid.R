@@ -15,8 +15,8 @@
 #' @export
 #'
 #' @examples
-#' # an area of interest, in this case Samoa's Exclusive Economic Zone
-#' samoa_eez <- system.file("extdata", "samoa_eez.rds", package = "spatialgridr") |> readRDS()
+#' # use get_boundary() to get a polygon of Samoa's Exclusive Economic Zone
+#' samoa_eez <- get_boundary(name = "Samoa")
 #' # You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
 #' samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 #' # Create a planning grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `projection_crs`.

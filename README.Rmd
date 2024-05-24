@@ -28,32 +28,41 @@ This package is still under development. Feel free to submit an issue with bugs 
 You can install the development version of `spatialgridr` from GitHub with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("emlab-ucsb/spatialgridr")
+# install.packages("remotes")
+remotes::install_github("emlab-ucsb/spatialgridr")
 ```
 
-`spatialgridr` has two functions:
+`spatialgridr` has three functions:
 
-* `get_grid()`: for creating a spatial grid
-* `get_data_in_grid()`: for gridding spatial data
+* `get_boundary()`: retrieves the boundaries for a marine or terrestrial area, such as a country or Exclusive Economic Zone (EEZ)
+* `get_grid()`: creates a spatial grid
+* `get_data_in_grid()`: grids spatial data
 
 
 ## Example
 
 This shows how to obtain a spatial grid and grid some data using that grid.
 
-```{r include=FALSE}
-#install from Github if needed
-remotes::install_github("emlab-ucsb/spatialgridr")
+```{r eval=FALSE}
+#load the package
 library(spatialgridr)
 ```
 
-We can obtain grids in raster (`terra::rast`) or vector (`sf`) format. First we need a polygon that we want to create a grid for. In this example we will use the exclusive economic zone (EEZ) of Samoa. We also need to provide a suitable projection for the area we are interested in, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
+```{r include=FALSE}
+devtools::load_all()
+```
+
+We can obtain grids in raster (`terra::rast`) or vector (`sf`) format. First we need a polygon that we want to create a grid for. In this example we will use the Exclusive Economic Zone (EEZ) of Samoa. We also need to provide a suitable projection for the area we are interested in, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
+
+```{r get_samoa_eez}
+#get Samoa's EEZ
+samoa_eez <- get_boundary(name = "Samoa")
+
+plot(samoa_eez["geometry"], axes = TRUE)
+```
+
 
 ```{r grid_raster}
-#load Samoa EEZ
-samoa_eez <- readRDS(system.file("extdata", "samoa_eez.rds", package = "spatialgridr"))
-
 #equal area projection for Samoa obtained from https://projectionwizard.org
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
@@ -130,8 +139,7 @@ plot(abyssal_plains_sf)
 
 ```{r}
 #load the Kiribati EEZ polygon
-kir_eez <- system.file("extdata", "kir_eez.rds", package = "spatialgridr") |>
-  readRDS()
+kir_eez <- get_boundary(name = "Kiribati", country_type = "sovereign")
 
 #create a grid for the Kiribati EEZ - Equal area projection obtained from https://projectionwizard.org
 kir_grid <- get_grid(area_polygon = kir_eez, projection_crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 20000, option = "sf_square")

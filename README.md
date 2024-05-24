@@ -19,31 +19,44 @@ You can install the development version of `spatialgridr` from GitHub
 with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("emlab-ucsb/spatialgridr")
+# install.packages("remotes")
+remotes::install_github("emlab-ucsb/spatialgridr")
 ```
 
-`spatialgridr` has two functions:
+`spatialgridr` has three functions:
 
-- `get_grid()`: for creating a spatial grid
-- `get_data_in_grid()`: for gridding spatial data
+- `get_boundary()`: retrieves the boundaries for a marine or terrestrial
+  area, such as a country or Exclusive Economic Zone (EEZ)
+- `get_grid()`: creates a spatial grid
+- `get_data_in_grid()`: grids spatial data
 
 ## Example
 
 This shows how to obtain a spatial grid and grid some data using that
 grid.
 
+``` r
+#load the package
+library(spatialgridr)
+```
+
 We can obtain grids in raster (`terra::rast`) or vector (`sf`) format.
 First we need a polygon that we want to create a grid for. In this
-example we will use the exclusive economic zone (EEZ) of Samoa. We also
+example we will use the Exclusive Economic Zone (EEZ) of Samoa. We also
 need to provide a suitable projection for the area we are interested in,
 <https://projectionwizard.org> is useful for this purpose. For spatial
 planning, equal area projections are normally best.
 
 ``` r
-#load Samoa EEZ
-samoa_eez <- readRDS(system.file("extdata", "samoa_eez.rds", package = "spatialgridr"))
+#get Samoa's EEZ
+samoa_eez <- get_boundary(name = "Samoa")
 
+plot(samoa_eez["geometry"], axes = TRUE)
+```
+
+<img src="man/figures/README-get_samoa_eez-1.png" width="100%" />
+
+``` r
 #equal area projection for Samoa obtained from https://projectionwizard.org
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
@@ -148,8 +161,7 @@ example using Kiribati’s EEZ as the grid area.
 
 ``` r
 #load the Kiribati EEZ polygon
-kir_eez <- system.file("extdata", "kir_eez.rds", package = "spatialgridr") |>
-  readRDS()
+kir_eez <- get_boundary(name = "Kiribati", country_type = "sovereign")
 
 #create a grid for the Kiribati EEZ - Equal area projection obtained from https://projectionwizard.org
 kir_grid <- get_grid(area_polygon = kir_eez, projection_crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 20000, option = "sf_square")
@@ -164,9 +176,18 @@ kir_abyssal_plains <- get_data_in_grid(spatial_grid = kir_grid, dat = abyssal_pl
 #> Spherical geometry (s2) switched on
 #> Warning: attribute variables are assumed to be spatially constant throughout
 #> all geometries
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+```
+
+``` r
 
 #plot
 plot(kir_abyssal_plains, border = FALSE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
