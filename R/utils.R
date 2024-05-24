@@ -3,35 +3,35 @@
 #' Check planning grid or area polygon input is supplied and is in correct format
 #'
 #' @param spatial_grid sf or raster planning grid
-#' @param area_polygon sf object
+#' @param boundary sf object
 #'
 #' @noRd
-check_grid_or_polygon <- function(spatial_grid, area_polygon) {
-  if (is.null(area_polygon) & is.null(spatial_grid)) {
+check_grid_or_polygon <- function(spatial_grid, boundary) {
+  if (is.null(boundary) & is.null(spatial_grid)) {
     stop("an area polygon or planning grid must be supplied")
-  } else if (!is.null(area_polygon) & !is.null(spatial_grid)) {
+  } else if (!is.null(boundary) & !is.null(spatial_grid)) {
     stop("please supply either an area polygon or a planning grid, not both")
   } else if (!is.null(spatial_grid) &
              !(class(spatial_grid)[1] %in% c("RasterLayer", "SpatRaster", "sf"))) {
     stop("spatial_grid must be a raster or sf object")
-  } else if (!is.null(area_polygon) &
-             !(class(area_polygon)[1] == "sf")) {
-    stop("area_polygon must be an sf object")
+  } else if (!is.null(boundary) &
+             !(class(boundary)[1] == "sf")) {
+    stop("boundary must be an sf object")
   }
 }
 
 
 #' Check if area polygon or planning grid crs is same as data crs
 #'
-#' @param area_polygon sf object
+#' @param boundary sf object
 #' @param spatial_grid raster or sf
 #' @param dat raster or sf
 #'
 #' @return `logical` TRUE crs' match, FALSE if they don't
 #' @noRd
-check_matching_crs <- function(area_polygon, spatial_grid, dat){
+check_matching_crs <- function(boundary, spatial_grid, dat){
   if(is.null(spatial_grid)){
-    ifelse(sf::st_crs(area_polygon) == sf::st_crs(dat), TRUE, FALSE)
+    ifelse(sf::st_crs(boundary) == sf::st_crs(dat), TRUE, FALSE)
   }else{
     ifelse(sf::st_crs(spatial_grid) == sf::st_crs(dat), TRUE, FALSE)
   }

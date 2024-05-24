@@ -27,6 +27,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      PKG_SYSREQS: false
 
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +39,10 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+
+      - name: dependencies on Linux
+        if: runner.os == 'Linux'
+        run: sudo sh -c apt-get -y install libcurl4-gnutls-dev libssl-dev libgeos-dev make git libgdal-dev gdal-bin libproj-dev libsqlite3-dev libudunits2-dev pandoc librdf0-dev libicu-dev libxml2-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:

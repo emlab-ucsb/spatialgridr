@@ -2,10 +2,10 @@
 % Please edit documentation in R/get_grid.R
 \name{get_grid}
 \alias{get_grid}
-\title{Create a planning grid raster for an area of interest}
+\title{Create a spatial grid}
 \usage{
 get_grid(
-  area_polygon,
+  boundary,
   projection_crs,
   option = "raster",
   resolution = 5000,
@@ -13,30 +13,33 @@ get_grid(
 )
 }
 \arguments{
-\item{area_polygon}{an sf polygon or multipolygon object of the area of interest (e.g., a country's EEZ)}
+\item{boundary}{\code{sf} object with boundary of the area(s) you want a grid for, e.g an EEZ or country. Boundaries can be obtained using \code{get_boundary()}}
 
-\item{projection_crs}{a suitable crs for the area of interest; for prioritization work, best practices is to use a local, equal area projection}
+\item{projection_crs}{a suitable crs for the area of interest}
 
 \item{option}{the desired output format, either "raster", "sf_square" (vector), or "sf_hex" (vector); default is "raster"}
 
-\item{resolution}{numeric; the desired planning unit (grid cell) resolution in units (usually metres or degrees) of the projection_crs: \code{sf::st_crs(projection_crs, parameters = TRUE)$units_gdal}}
+\item{resolution}{\code{numeric}; the desired grid cell resolution in units (usually metres or degrees) of the projection_crs: \code{sf::st_crs(projection_crs, parameters = TRUE)$units_gdal}}
 
-\item{sf_method}{string; should the planning unit be returned based on the \code{"centroid"} of the planning unit falling within the area_polygon, or any \code{"overlap"} of the planning unit with the area_polygon. \code{"overlap"} will be significantly slower.}
+\item{sf_method}{\code{string}. Only for \code{sf} grids:
+\itemize{
+\item \code{"centroid"} a cell will be included in the grid if the centroid of the cell falls within the \code{boundary}, or if there is any \code{"overlap"} with the boundary. \code{"overlap"} will be significantly slower.
+}}
 }
 \value{
-A \code{terra::rast()} of \code{sf} planning grid of the same resolution and crs provided
+A \code{terra::rast()} of \code{sf} grid with resolution and crs provided
 }
 \description{
-This function creates a planning grid for area of interest.
+Creates a spatial grid, in \code{terra::rast()} of \code{sf} format, for areas within the boundaries provided
 }
 \details{
-This function uses \code{sf::st_make_grid()} to create an \code{sf} planning grid. The default ordering of this grid type is from bottom to top, left to right. In contrast, the planning grid resulting from a \code{raster} object is ordered from top to bottom, left to right. To preserve consistency across the data types, we have reordered the \code{sf} planning grid to also fill from top to bottom, left to right.
+This function uses \code{sf::st_make_grid()} to create \code{sf} grids. The default ordering of this grid type is from bottom to top, left to right. In contrast, the \code{terra::rast()} grid is ordered from top to bottom, left to right. To preserve consistency across the data types, we have reordered \code{sf} grids to also fill from top to bottom, left to right.
 }
 \examples{
 # use get_boundary() to get a polygon of Samoa's Exclusive Economic Zone
 samoa_eez <- get_boundary(name = "Samoa")
 # You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
-# Create a planning grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `projection_crs`.
-planning_grid <- get_grid(area_polygon = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
+# Create a grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `projection_crs`.
+samoa_grid <- get_grid(boundary = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
 }
