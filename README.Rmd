@@ -68,7 +68,7 @@ We also need to provide a suitable projection for the area we are interested in,
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
 # Create a raster grid with 10km sized cells
-samoa_grid <- get_grid(boundary = samoa_eez, projection_crs = samoa_projection, resolution = 10000)
+samoa_grid <- get_grid(boundary = samoa_eez, resolution = 10000, crs = samoa_projection)
 
 #plot the grid
 terra::plot(samoa_grid)
@@ -79,7 +79,7 @@ terra::lines(terra::as.polygons(samoa_grid, dissolve = FALSE)) #add the outlines
 To obtain a grid in `sf` format we can use arguments `option = "sf_square"` or `option = "sf_hex"` in `get_grid` to specify square or hexagonal cells. We will create and plot a hexagonal grid with 10 km wide cells.
 
 ```{r grid_sf}
-samoa_grid_sf <- get_grid(boundary = samoa_eez, projection_crs = samoa_projection, resolution = 10000, option = "sf_hex")
+samoa_grid_sf <- get_grid(boundary = samoa_eez, resolution = 10000, crs = samoa_projection, output = "sf_hex")
 
 plot(samoa_grid_sf)
 ```
@@ -143,7 +143,7 @@ plot(abyssal_plains_sf)
 kir_eez <- get_boundary(name = "Kiribati", country_type = "sovereign")
 
 #create a grid for the Kiribati EEZ - Equal area projection obtained from https://projectionwizard.org
-kir_grid <- get_grid(boundary = kir_eez, projection_crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 20000, option = "sf_square")
+kir_grid <- get_grid(boundary = kir_eez, resolution = 20000, crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', output = "sf_square")
 
 #get abyssal plains classification for Kiribati grid
 kir_abyssal_plains <- get_data_in_grid(spatial_grid = kir_grid, dat = abyssal_plains, feature_names = "Class")

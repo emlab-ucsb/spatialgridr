@@ -51,7 +51,7 @@ samoa_eez <- get_boundary(name = "Samoa")
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
 # Create a spatial grid with 5km square cells
-samoa_grid <- get_grid(boundary = samoa_eez, projection_crs = samoa_projection, resolution = 5000)
+samoa_grid <- get_grid(boundary = samoa_eez, resolution = 5000, crs = samoa_projection)
 # Get ridges data, which is vector data in sf format, in the spatial grid
 ridges_gridded <- get_data_in_grid(spatial_grid = samoa_grid, dat = ridges)
 terra::plot(ridges_gridded)
