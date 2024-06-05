@@ -7,7 +7,7 @@
 #' @param name `character` to name the data output; unless `feature_names` is supplied, in which case that column is used as the feature names
 #' @param feature_names `character` (`sf` data only) column with feature names that will be used for grouping of input data. If NULL, `sf` data is assumed to represent a single features, e.g. one habitat or species.
 #' @param antimeridian `logical` can be set to true if the `boundary` or `spatial_grid` for which data will be extracted crosses the antimeridian and the data source is in lon-lat (EPSG:4326) format. If set to `NULL` (default) the function will try to check if the antimeridian is crossed and set this appropriately. Note that if you are using an `boundary` or `spatial_grid` that crosses the antimeridian and have data that is not in lon-lat
-#' @param cutoff `numeric` (`sf` data only) cover fraction value between 0 and 1; if gridded output is required (i.e. a `spatial_grid` is provided), how much of each grid cell should be covered by an sf feature for it to be classified as that feature type
+#' @param cutoff `numeric` for `sf` gridded data only, i.e. an `sf` `spatial_grid` is provided. How much of each grid cell should be covered by an `sf` feature for it to be classified as that feature type (cover fraction value between 0 and 1). For example, if `cutoff = 0.5` (default), at least half of each grid cell has to be covered by a feature for the cell to be classified as that feature. If `NULL`, the % coverage of each feature in each grid cell is returned
 #'
 #' @param apply_cutoff `logical` (`sf` data only) if gridded output is required (i.e. a `spatial_grid` is provided), `FALSE` will return an `sf` object with the % coverage of each feature in each grid cell, as opposed to a binary presence/ absence. `feature_names` should be provided.
 #'
@@ -34,7 +34,7 @@
 #' cold_coral <- system.file("extdata", "cold_coral.tif", package = "spatialgridr") |> terra::rast()
 #' coral_gridded <- get_data_in_grid(spatial_grid = samoa_grid, dat = cold_coral)
 #' terra::plot(coral_gridded)
-get_data_in_grid <- function(boundary = NULL, spatial_grid = NULL, dat = NULL, meth = NULL, name = NULL, feature_names = NULL, antimeridian = NULL, cutoff = 0.5, apply_cutoff = TRUE){
+get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth = NULL, name = NULL, feature_names = NULL, antimeridian = NULL, cutoff = 0.5){
   if(is.null(dat)){
     stop("Please provide some input data")
   }
