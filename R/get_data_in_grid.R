@@ -36,6 +36,7 @@ get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth 
   if(is.null(dat)){
     stop("Please provide some input data")
   }
+
   check_grid(spatial_grid)
 
   dat <- data_from_filepath(dat)
@@ -74,7 +75,9 @@ get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth 
   } else if(check_raster(dat)){
     ras_to_grid(spatial_grid, dat, matching_crs, meth, name, antimeridian)
     } else {
+
     sf_to_grid(spatial_grid, dat, matching_crs, name, feature_names, antimeridian, cutoff)
+
   }
 
 }

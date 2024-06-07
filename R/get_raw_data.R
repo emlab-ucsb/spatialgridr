@@ -3,7 +3,7 @@
 #' @description
 #' Called by `get_data_in_grid` when needed
 #'
-#' @param spatial_grid `sf` polygon to crop/ mask/ intersect with
+#' @param spatial_grid `sf` polygon to crop/ mask/ intersect data with
 #' @param dat `terra::rast()` or `sf` data
 #' @param meth `string` name of method to use for raster projection if data is raster
 #' @param matching_crs `logical` TRUE if `spatial_grid` and `dat` have the same crs
