@@ -3,15 +3,15 @@
 #' @description
 #' Called by `get_data_in_grid` when needed
 #'
-#' @param boundary `sf` polygon to crop/ mask/ intersect with
+#' @param spatial_grid grid or `sf` polygon to crop/ mask/ intersect with
 #' @param dat `terra::rast()` or `sf` data
 #' @param meth `string` name of method to use for raster projection if data is raster
-#' @param matching_crs `logical` TRUE if `boundary` and `dat` have the same crs
+#' @param matching_crs `logical` TRUE if `spatial_grid` and `dat` have the same crs
 #' @param antimeridian `logical` TRUE if cropping area crosses the antimeridian
 #'
 #' @return `terra::rast()` or `sf`
 #' @noRd
-get_raw_data <- function(boundary, dat, meth, matching_crs, antimeridian){
+get_raw_data <- function(spatial_grid, dat, meth, matching_crs, antimeridian){
   boundary <- boundary %>%
     sf::st_geometry() %>%
     sf::st_as_sf()
