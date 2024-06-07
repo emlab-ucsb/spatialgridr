@@ -10,7 +10,7 @@ samoa_eez <- readRDS(system.file("extdata", "samoa_eez.rds", package = "spatialg
 #equal area projection for Samoa obtained from https://projectionwizard.org
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
-planning_grid_sf_coarse <- get_grid(boundary = samoa_eez, projection_crs = samoa_projection, resolution = 30000, option = "sf_hex")
+planning_grid_sf_coarse <- get_grid(boundary = samoa_eez, crs = samoa_projection, resolution = 30000, output = "sf_hex")
 
 #grid the data
 ridges_gridded_sf_coarse <- get_data_in_grid(spatial_grid = planning_grid_sf_coarse, dat = ridges)

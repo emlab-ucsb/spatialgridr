@@ -3,16 +3,17 @@
 #' @description
 #' Called from `get_data_in_grid` when needed
 #'
-#' @param dat `terra::rast()` input data
 #' @param spatial_grid `terra::rast()` or `sf` planning grid
+#' @param dat `sf` input data
 #' @param matching_crs `logical` TRUE if crs of data and planning grid match, else FASE
 #' @param name `string` name of returned raster or if sf, column name in sf object
 #' @param feature_names `string` names of columns in sf data that will be gridded
 #' @param antimeridian `logical` TRUE if data to be gridded cross the antimeridian
+#' @param cutoff `numeric` for `sf` gridded data only, i.e. an `sf` `spatial_grid` is provided. How much of each grid cell should be covered by an `sf` feature for it to be classified as that feature type (cover fraction value between 0 and 1). For example, if `cutoff = 0.5` (default), at least half of each grid cell has to be covered by a feature for the cell to be classified as that feature. If `NULL`, the % coverage of each feature in each grid cell is returned.
 #'
 #' @return `terra::rast()` or `sf` gridded data, depending on `spatial_grid` format
 #' @noRd
-sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, antimeridian, cutoff, apply_cutoff){
+sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, antimeridian, cutoff){
 
   is_raster <- check_raster(spatial_grid)
 
@@ -22,7 +23,6 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
   } else{
     grid_temp <- spatial_grid %>%
       {if(is_raster) terra::as.polygons(.) %>% sf::st_as_sf() else .} %>%
-    sf::st_geometry() %>%
       sf::st_transform(sf::st_crs(dat)) %>%
       {if(antimeridian) sf::st_shift_longitude(.) else .}
 
@@ -32,12 +32,14 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
         else if(all(antimeridian & (c("POINT", "MULTIPOINT") %in% unique(sf::st_geometry_type(.))))){
           sf::st_shift_longitude(.)} else .} %>%
       sf::st_crop(grid_temp) %>%
-      sf::st_transform(sf::st_crs(spatial_grid))
+      sf::st_transform(sf::st_crs(spatial_grid)) %>%
+      {if(all(sf::st_is_valid(.))) . else sf::st_make_valid(.)}
   }
 
   if(is.null(feature_names)){
     if(is.null(name)) name <- "data"
 
+    #return raster or sf object with zeroes if no data in the spatial grid
     if(nrow(dat_cropped) == 0){
       message("No ", name, " in grid")
       if(is_raster){
@@ -58,6 +60,7 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
       {if(all(c("POLYGON", "MULTIPOLYGON") %in% (sf::st_geometry_type(.) %>% unique() %>% as.character()))) sf::st_cast(., to = "MULTIPOLYGON") else .}
 
   }  else {
+    #return raster or sf object with zeroes if no data in the spatial grid
     if(nrow(dat_cropped) == 0){
       message("No data in grid")
 
@@ -89,7 +92,7 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
       terra::rast() %>%
       setNames(nms) %>%
       terra::mask(spatial_grid) %>%
-      {if(apply_cutoff) terra::classify(., matrix(c(-1, cutoff, 0, cutoff, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = FALSE, right = FALSE) else .}
+      {if(!is.null(cutoff)) terra::classify(., matrix(c(-1, cutoff, 0, cutoff, 1.2, 1), ncol = 3, byrow = TRUE), include.lowest = FALSE, right = FALSE) else .}
 
     #check if some features were cropped out; if so, need to add raster layers with zeroes in
     if(is.null(feature_names)) {
@@ -142,7 +145,7 @@ sf_to_grid <- function(dat, spatial_grid, matching_crs, name, feature_names, ant
           dplyr::mutate(perc_area = dplyr::case_when(is.na(.data$perc_area) ~ 0,
                                                      .default = as.numeric(.data$perc_area))) %>%
           dplyr::left_join(spatial_grid_with_id, .,  by = "cellID") %>%
-          {if(!apply_cutoff) dplyr::select(., .data$perc_area, {{layer}} := .data$perc_area) else {
+          {if(is.null(cutoff)) dplyr::select(., .data$perc_area, {{layer}} := .data$perc_area) else {
             dplyr::mutate(.,
                           {{layer}} := dplyr::case_when(.data$perc_area >= cutoff  ~ 1,
                                                     .default = 0)

@@ -1,40 +1,27 @@
 # A file of little functions that we use across the board.
 
-#' Check planning grid or area polygon input is supplied and is in correct format
+#' Check a spatial grid is supplied and in raster or sf format
 #'
-#' @param spatial_grid sf or raster planning grid
-#' @param boundary sf object
+#' @param spatial_grid
 #'
 #' @noRd
-check_grid_or_polygon <- function(spatial_grid, boundary) {
-  if (is.null(boundary) & is.null(spatial_grid)) {
-    stop("an area polygon or planning grid must be supplied")
-  } else if (!is.null(boundary) & !is.null(spatial_grid)) {
-    stop("please supply either an area polygon or a planning grid, not both")
-  } else if (!is.null(spatial_grid) &
-             !(class(spatial_grid)[1] %in% c("RasterLayer", "SpatRaster", "sf"))) {
+check_grid <- function(spatial_grid) {
+  if (is.null(spatial_grid)) {
+    stop("a spatial grid must be supplied")
+  } else if (!(class(spatial_grid)[1] %in% c("RasterLayer", "SpatRaster", "sf"))) {
     stop("spatial_grid must be a raster or sf object")
-  } else if (!is.null(boundary) &
-             !(class(boundary)[1] == "sf")) {
-    stop("boundary must be an sf object")
   }
 }
 
-
-#' Check if area polygon or planning grid crs is same as data crs
+#' Check if area spatial objects have same crs
 #'
-#' @param boundary sf object
-#' @param spatial_grid raster or sf
-#' @param dat raster or sf
+#' @param sp1 raster or sf
+#' @param sp2 raster or sf
 #'
 #' @return `logical` TRUE crs' match, FALSE if they don't
 #' @noRd
-check_matching_crs <- function(boundary, spatial_grid, dat){
-  if(is.null(spatial_grid)){
-    ifelse(sf::st_crs(boundary) == sf::st_crs(dat), TRUE, FALSE)
-  }else{
-    ifelse(sf::st_crs(spatial_grid) == sf::st_crs(dat), TRUE, FALSE)
-  }
+check_matching_crs <- function(sp1, sp2){
+    ifelse(sf::st_crs(sp1) == sf::st_crs(sp2), TRUE, FALSE)
 }
 
 #' Check if sf object spans the antimeridian
@@ -59,28 +46,28 @@ check_antimeridian <- function(sf_object, dat){
   } else FALSE
 }
 
-#' Check if data is a raster
+#' Check if object is a raster
 #'
-#' @param dat
+#' @param sp
 #'
 #' @return `logical` TRUE if raster, else FALSE
 #' @noRd
-check_raster <- function(dat){
-  if(class(dat)[1] %in% c("RasterLayer", "SpatRaster")){
+check_raster <- function(sp){
+  if(class(sp)[1] %in% c("RasterLayer", "SpatRaster")){
     return(TRUE)
   }else{
     return(FALSE)
   }
 }
 
-#' Check if data is sf
+#' Check if object is sf
 #'
-#' @param dat
+#' @param sp
 #'
 #' @return TRUE if sf, else FALSE
 #' @noRd
-check_sf <- function(dat){
-  if(class(dat)[1] == "sf"){
+check_sf <- function(sp){
+  if(class(sp)[1] == "sf"){
     return(TRUE)
   }else{
     return(FALSE)

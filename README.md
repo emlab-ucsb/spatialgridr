@@ -28,9 +28,10 @@ remotes::install_github("emlab-ucsb/spatialgridr")
 - `get_boundary()`: retrieves the boundaries for a marine or terrestrial
   area, such as a country or Exclusive Economic Zone (EEZ)
 - `get_grid()`: creates a spatial grid
-- `get_data_in_grid()`: grids spatial data
+- `get_data_in_grid()`: grids spatial data; can also be used to crop/
+  intersect a polygon with data
 
-## Example
+## Examples
 
 This shows how to obtain a spatial grid and grid some data using that
 grid.
@@ -39,6 +40,8 @@ grid.
 #load the package
 library(spatialgridr)
 ```
+
+## Get a boundary
 
 We can obtain grids in raster (`terra::rast`) or vector (`sf`) format.
 First we need a polygon that we want to create a grid for. We can
@@ -55,6 +58,8 @@ plot(samoa_eez["geometry"], axes = TRUE)
 
 <img src="man/figures/README-get_samoa_eez-1.png" width="100%" />
 
+## Get a grid
+
 We also need to provide a suitable projection for the area we are
 interested in, <https://projectionwizard.org> is useful for this
 purpose. For spatial planning, equal area projections are normally best.
@@ -64,7 +69,7 @@ purpose. For spatial planning, equal area projections are normally best.
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
 # Create a raster grid with 10km sized cells
-samoa_grid <- get_grid(boundary = samoa_eez, projection_crs = samoa_projection, resolution = 10000)
+samoa_grid <- get_grid(boundary = samoa_eez, resolution = 10000, crs = samoa_projection)
 
 #plot the grid
 terra::plot(samoa_grid)
@@ -79,16 +84,18 @@ square or hexagonal cells. We will create and plot a hexagonal grid with
 10 km wide cells.
 
 ``` r
-samoa_grid_sf <- get_grid(boundary = samoa_eez, projection_crs = samoa_projection, resolution = 10000, option = "sf_hex")
+samoa_grid_sf <- get_grid(boundary = samoa_eez, resolution = 10000, crs = samoa_projection, output = "sf_hex")
 
 plot(samoa_grid_sf)
 ```
 
 <img src="man/figures/README-grid_sf-1.png" width="100%" />
 
+## Grid data
+
 Now we can grid some data. Data can be in raster (`terra::rast()`) or
-`sf` format. Here’s an example using global data mapping ridges which is
-in `sf` format:
+`sf` format. Here’s an example using a global map of seafloor ridges
+which is in `sf` format:
 
 ``` r
 # ridges data for area of Pacific
@@ -121,7 +128,8 @@ terra::lines(samoa_eez |> sf::st_transform(crs = samoa_projection)) #add Samoa's
 
 <img src="man/figures/README-grid_raster_data-1.png" width="100%" />
 
-We can also use the sf grid we created to return data in sf format:
+We can also use the sf grid we created to return gridded data in sf
+format:
 
 ``` r
 #grid the data
@@ -167,7 +175,7 @@ antimeridian. Here’s an example using Kiribati’s EEZ as the grid area.
 kir_eez <- get_boundary(name = "Kiribati", country_type = "sovereign")
 
 #create a grid for the Kiribati EEZ - Equal area projection obtained from https://projectionwizard.org
-kir_grid <- get_grid(boundary = kir_eez, projection_crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', resolution = 20000, option = "sf_square")
+kir_grid <- get_grid(boundary = kir_eez, resolution = 50000, crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', output = "sf_square")
 
 #get abyssal plains classification for Kiribati grid
 kir_abyssal_plains <- get_data_in_grid(spatial_grid = kir_grid, dat = abyssal_plains, feature_names = "Class")
@@ -193,4 +201,32 @@ kir_abyssal_plains <- get_data_in_grid(spatial_grid = kir_grid, dat = abyssal_pl
 plot(kir_abyssal_plains, border = FALSE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-grid_multi_sf_antimeridian-1.png" width="100%" />
+
+## Get raw data
+
+If you just want to get data for an area, but don’t want to grid it, you
+can provide an `sf` polygon to `get_data_in_grid()` and set
+`raw = TRUE`.
+
+``` r
+kir_abyssal_plains_raw <- get_data_in_grid(spatial_grid = kir_eez, dat = abyssal_plains, raw = TRUE)
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
+```
+
+``` r
+
+#shift longitude to make it easier to view data
+plot(kir_abyssal_plains_raw[1] %>% sf::st_shift_longitude(), border = FALSE)
+```
+
+<img src="man/figures/README-raw_data_sf-1.png" width="100%" />
+
+``` r
+samoa_coral_raw <- get_data_in_grid(spatial_grid = samoa_eez, dat = cold_coral, raw = TRUE)
+
+terra::plot(samoa_coral_raw)
+```
+
+<img src="man/figures/README-raw_data_raster-1.png" width="100%" />
