@@ -1,13 +1,13 @@
 test_that("retrieving eez matches mregions2", {
-  expect_equal(get_boundary(name = "Australia", type = "eez", country_type = "country"), mregions2::mrp_get("eez", cql_filter = "territory1 = 'Australia'"))
+  expect_equal(get_boundary(name = "Bermuda", type = "eez", country_type = "country"), mregions2::mrp_get("eez", cql_filter = "territory1 = 'Bermuda'"))
 })
 
 test_that("eez is sf object", {
-  expect_s3_class(get_boundary(name = "France", type = "eez", country_type = "sovereign"), "sf")
+  expect_s3_class(get_boundary(name = "Tonga", type = "eez", country_type = "sovereign"), "sf")
 })
 
 test_that("12nm is sf object", {
-  expect_s3_class(get_boundary(name = "United Kingdom", type = "12nm", country_type = "sovereign"), "sf")
+  expect_s3_class(get_boundary(name = "Bermuda", type = "12nm", country_type = "country"), "sf")
 })
 
 test_that("oceans is sf object", {

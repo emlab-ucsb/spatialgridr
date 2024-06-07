@@ -3,9 +3,8 @@
 #' @description
 #' Called from `get_data_in_grid` when needed
 #'
-#'
-#' @param dat `terra::rast()` input data
 #' @param spatial_grid `terra::rast()` or `sf` planning grid
+#' @param dat `terra::rast()` input data
 #' @param matching_crs `logical` TRUE if crs of data and planning grid match, else FASE
 #' @param meth `string` name of method using for projecting/ resampling of raster, or gridding to sf
 #' @param name `string` name of returned raster or if sf, column name in sf object
@@ -14,7 +13,7 @@
 #' @return `terra::rast()` or `sf` gridded data, depending on `spatial_grid` format
 #'
 #' @noRd
-ras_to_grid <- function(dat, spatial_grid, matching_crs, meth, name, antimeridian){
+ras_to_grid <- function(spatial_grid, dat, matching_crs, meth, name, antimeridian){
 
   if(is.null(name)) name <- names(dat)
 

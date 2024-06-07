@@ -1,8 +1,8 @@
 #' Get gridded or cropped data from input data
 #'
 #' @param spatial_grid `sf` or `terra::rast()` grid created using `get_grid()`. Alternatively, if raw data is required, an `sf` polygon can be provided, e.g. created using `get_boundary()`
-#' @param dat `sf` or `terra::rast()` data to be gridded/ cropped
-#' @param raw `logical` TRUE returns `dat` cropped and masked/ intersected with `spatial_grid` (which can just be an `sf` polygon in this case)
+#' @param dat `sf` or `terra::rast()` data to be gridded/ cropped. Can also be a path to a file.
+#' @param raw `logical` TRUE returns `dat` cropped and masked/ intersected with `spatial_grid`. If `TRUE`, `spatial_grid` should be an `sf` polygon.
 #' @param meth `character` method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as `exactextractr::exact_extract()` is used for gridding to sf spatial grid, whereas `terra::project()`/`terra::resample()` is used for transforming/ gridding raster data.
 #' @param name `character` to name the data output; unless `feature_names` is supplied, in which case that column is used as the feature names
 #' @param feature_names `character` (`sf` data only) column with feature names that will be used for grouping of input data. If NULL, `sf` data is assumed to represent a single features, e.g. one habitat or species.
@@ -36,11 +36,11 @@ get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth 
   if(is.null(dat)){
     stop("Please provide some input data")
   }
-  check_grid_or_polygon(spatial_grid)
+  check_grid(spatial_grid)
 
   dat <- data_from_filepath(dat)
 
-  matching_crs <- check_matching_crs(spatial_grid)
+  matching_crs <- check_matching_crs(spatial_grid, dat)
 
   antimeridian <- if(is.null(antimeridian)){
     sf_object <- if(check_sf(spatial_grid)) spatial_grid else terra::as.polygons(spatial_grid) %>% sf::st_as_sf()
@@ -72,9 +72,9 @@ get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth 
     get_raw_data(spatial_grid, dat, meth, matching_crs, antimeridian)
 
   } else if(check_raster(dat)){
-    ras_to_grid(dat, spatial_grid, matching_crs, meth, name, antimeridian)
+    ras_to_grid(spatial_grid, dat, matching_crs, meth, name, antimeridian)
     } else {
-    sf_to_grid(dat, spatial_grid, matching_crs, name, feature_names, antimeridian, cutoff)
+    sf_to_grid(spatial_grid, dat, matching_crs, name, feature_names, antimeridian, cutoff)
   }
 
 }
