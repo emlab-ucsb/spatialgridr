@@ -83,8 +83,8 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># use get_boundary() to get a polygon of Samoa's Exclusive Economic Zone</span></span></span>
 <span class="r-in"><span><span class="va">samoa_eez</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_boundary.html">get_boundary</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Samoa"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Cache is fresh. Reading: <span style="color: #0000BB;">/tmp/Rtmp2SyCYM/eez-d0aa43d6/eez.shp</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> (Last Modified: <span style="font-style: italic;">2024-06-07 05:31:27.125238</span>)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Cache is fresh. Reading: <span style="color: #0000BB;">/tmp/Rtmpt02QLb/eez-d0aa43d6/eez.shp</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (Last Modified: <span style="font-style: italic;">2024-06-10 02:11:35.793684</span>)</span>
 <span class="r-in"><span><span class="co"># You need a suitable coordinate reference system (crs) for your area of interest, https://projectionwizard.org is useful for this purpose. For spatial planning, equal area projections are normally best.</span></span></span>
 <span class="r-in"><span><span class="va">samoa_projection</span> <span class="op">&lt;-</span> <span class="st">'+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'</span></span></span>
 <span class="r-in"><span><span class="co"># Create a grid with 5 km (5000 m) resolution covering the `samoa_eez` in a projection specified by `crs`.</span></span></span>
