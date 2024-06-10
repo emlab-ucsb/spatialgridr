@@ -1,6 +1,6 @@
 #' Get gridded or cropped data from input data
 #'
-#' @param spatial_grid `sf` or `terra::rast()` grid created using `get_grid()`. Alternatively, if raw data is required, an `sf` polygon can be provided, e.g. created using `get_boundary()`
+#' @param spatial_grid `sf` or `terra::rast()` grid, e.g. created using `get_grid()`. Alternatively, if raw data is required, an `sf` polygon can be provided, e.g. created using `get_boundary()`, and set `raw = TRUE`.
 #' @param dat `sf` or `terra::rast()` data to be gridded/ cropped. Can also be a path to a file.
 #' @param raw `logical` TRUE returns `dat` cropped and masked/ intersected with `spatial_grid`. If `TRUE`, `spatial_grid` should be an `sf` polygon.
 #' @param meth `character` method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as `exactextractr::exact_extract()` is used for gridding to sf spatial grid, whereas `terra::project()`/`terra::resample()` is used for transforming/ gridding raster data.
