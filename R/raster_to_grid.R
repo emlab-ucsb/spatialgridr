@@ -59,7 +59,7 @@ ras_to_grid <- function(spatial_grid, dat, matching_crs, meth, name, antimeridia
       data.frame(temp_grid, .) %>%
       sf::st_sf() %>%
       {if(matching_crs) . else sf::st_transform(., sf::st_crs(spatial_grid))} %>%
-      {if(grid_has_extra_cols) cbind(., extra_cols) %>% dplyr::select(colnames(extra_cols), name) else .} %>%
+      {if(grid_has_extra_cols) cbind(., extra_cols) %>% dplyr::relocate(colnames(extra_cols), .before = 1) else .} %>%
       sf::st_set_geometry("geometry")
   }
 }
