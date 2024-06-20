@@ -16,7 +16,7 @@ get_raw_data <- function(spatial_grid, dat, meth, matching_crs, antimeridian){
   if(check_raster(dat)){
     if(matching_crs){
       dat %>%
-        terra::crop(sf::st_as_sf(spatial_grid), mask = TRUE)
+        terra::crop(., sf::st_as_sf(spatial_grid), mask = TRUE)
     }else{
       spatial_grid %>%
         sf::st_transform(sf::st_crs(dat)) %>%
