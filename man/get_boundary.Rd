@@ -15,6 +15,7 @@ get_boundary(name = "Australia", type = "eez", country_type = "country")
 \item \verb{12nm}: 12 nautical miles zone (Territorial Seas), defined in \href{https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm}{UNCLOS}
 \item \verb{24nm}: 14 nautical miles zone (Contiguous Zone), defined in \href{https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm}{UNCLOS}
 \item \code{ocean}: Global Oceans and Seas as compiled by the Flanders Marine Data Centre. Names are: "Arctic Ocean", "Baltic Sea", "Indian Ocean", "Mediterranean Region", "North Atlantic Ocean", "North Pacific Ocean", "South Atlantic Ocean", "South China and Easter Archipelagic Seas", "South Pacific Ocean", and "Southern Ocean".
+\item \code{high_seas}: as defined by the UN Law of the Sea: "all parts of the sea that are not included in the exclusive economic zone, in the territorial sea or in the internal waters of a State, or in the archipelagic waters of an archipelagic State". Note that \code{name} and \code{country_type} are not relevant for this query: only all High Seas areas can be downloaded.
 \item \code{countries}: country boundaries
 }
 
