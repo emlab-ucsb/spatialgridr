@@ -8,6 +8,7 @@
 #' * `12nm`: 12 nautical miles zone (Territorial Seas), defined in [UNCLOS](https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm)
 #' * `24nm`: 14 nautical miles zone (Contiguous Zone), defined in [UNCLOS](https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm)
 #' * `ocean`: Global Oceans and Seas as compiled by the Flanders Marine Data Centre. Names are: "Arctic Ocean", "Baltic Sea", "Indian Ocean", "Mediterranean Region", "North Atlantic Ocean", "North Pacific Ocean", "South Atlantic Ocean", "South China and Easter Archipelagic Seas", "South Pacific Ocean", and "Southern Ocean".
+#' * `high_seas`: as defined by the UN Law of the Sea: "all parts of the sea that are not included in the exclusive economic zone, in the territorial sea or in the internal waters of a State, or in the archipelagic waters of an archipelagic State". Note that `name` and `country_type` are not relevant for this query: only all High Seas areas can be downloaded.
 #' * `countries`: country boundaries
 #'
 #' More details on the marine boundaries can be found on the [Marine Regions website](https://marineregions.org/sources.php), and for land boundaries, the [Natural Earth website](https://www.naturalearthdata.com/features/). Note that this function retrieves data from Natural Earth at the highest resolution (1:10m).
@@ -38,10 +39,9 @@
 #'plot(australia_land_and_territories["geometry"])
 #' }
 get_boundary <- function(name = "Australia", type = "eez", country_type = "country"){
-  # initial query types: country, eez, ocean, 12nm, 24nm
 
-  mregions_types <- c("eez", "12nm", "24nm", "ocean")
-  mregions_types_lookup <- c("eez", "eez_12nm", "eez_24nm", "goas")
+  mregions_types <- c("eez", "12nm", "24nm", "ocean", "high_seas")
+  mregions_types_lookup <- c("eez", "eez_12nm", "eez_24nm", "goas", "high_seas")
 
   rnaturalearth_type <- c("countries")
   all_types <- c(mregions_types, rnaturalearth_type)
@@ -52,11 +52,13 @@ get_boundary <- function(name = "Australia", type = "eez", country_type = "count
 
   if(!(type %in% all_types)) stop("'type' must be one of: ", paste(all_types, collapse = ", "))
 
-  if(!(country_type %in% country_types) & type != "ocean") stop(message = "'country_type' must be one of: ", paste(country_types, collapse = ", "))
+  if(!(country_type %in% country_types) & !(type %in% c("ocean", "high_seas"))) stop(message = "'country_type' must be one of: ", paste(country_types, collapse = ", "))
 
   if(type %in% mregions_types){
     rlang::check_installed("mregions2", reason = "to use `get_boundary()` to access marine boundaries", action = \(pkg, ...) remotes::install_github("lifewatch/mregions2"))
     query_type <- mregions_types_lookup[which(mregions_types == type)]
+
+    if(type == "high_seas") return(mregions2::mrp_get("high_seas"))
 
     if(is.null(name)) {
       message("You have requested all ", type, " boundaries, the download will take several minutes.")
