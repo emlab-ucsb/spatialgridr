@@ -6,7 +6,7 @@
 #' @param type `character` the boundary type. Can be one of:
 #' * `eez`: Exclusive Economic Zone (EEZ; 200nm). These EEZs differ slightly from the the [UN Convention on the Law of the Sea (UNCLOS)](https://www.un.org/depts/los/convention_agreements/texts/unclos/part5.htm) definition because the archipelagic waters and the internal waters of a country are included.
 #' * `12nm`: 12 nautical miles zone (Territorial Seas), defined in [UNCLOS](https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm)
-#' * `24nm`: 14 nautical miles zone (Contiguous Zone), defined in [UNCLOS](https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm)
+#' * `24nm`: 24 nautical miles zone (Contiguous Zone), defined in [UNCLOS](https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm)
 #' * `ocean`: Global Oceans and Seas as compiled by the Flanders Marine Data Centre. Names are: "Arctic Ocean", "Baltic Sea", "Indian Ocean", "Mediterranean Region", "North Atlantic Ocean", "North Pacific Ocean", "South Atlantic Ocean", "South China and Easter Archipelagic Seas", "South Pacific Ocean", and "Southern Ocean".
 #' * `high_seas`: as defined by the UN Law of the Sea: "all parts of the sea that are not included in the exclusive economic zone, in the territorial sea or in the internal waters of a State, or in the archipelagic waters of an archipelagic State". Note that `name` and `country_type` are not relevant for this query: only all High Seas areas can be downloaded.
 #' * `countries`: country boundaries
