@@ -22,7 +22,7 @@ get_data_in_grid(
 
 \item{raw}{\code{logical} TRUE returns \code{dat} cropped and masked/ intersected with \code{spatial_grid}. If \code{TRUE}, \code{spatial_grid} should be an \code{sf} polygon.}
 
-\item{meth}{\code{character} method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "average" for sf output or "mean" for raster output. Note that different methods are used for sf and raster as \code{exactextractr::exact_extract()} is used for gridding to sf spatial grid, whereas \code{terra::project()}/\code{terra::resample()} is used for transforming/ gridding raster data.}
+\item{meth}{\code{character} method to use for for gridding/ resampling/ reprojecting raster data. If NULL (default), function checks if data values are binary (all 0, 1, NA, or NaN) in which case method is set to "mode" for sf output or "near" for raster output. If data is non-binary, method is set to "mean" for sf output or "average" for raster output. Note that different methods are used for sf and raster as \code{exactextractr::exact_extract()} is used for gridding to sf spatial grid, whereas \code{terra::project()}/\code{terra::resample()} is used for transforming/ gridding raster data.}
 
 \item{name}{\code{character} to name the data output; unless \code{feature_names} is supplied, in which case that column is used as the feature names}
 
