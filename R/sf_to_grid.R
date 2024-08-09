@@ -33,7 +33,8 @@ sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, ant
           sf::st_shift_longitude(.)} else .} %>%
       sf::st_crop(grid_temp) %>%
       sf::st_transform(sf::st_crs(spatial_grid)) %>%
-      {if(all(sf::st_is_valid(.))) . else sf::st_make_valid(.)}
+      {if(all(sf::st_is_valid(.))) . else sf::st_make_valid(.)} %>%
+      {if(any(sf::st_is(., c("POINT", "MULTIPOINT")), all(sf::st_is(., "POLYGON")),  all(sf::st_is(., "MULTIPOLYGON")))) . else sf::st_collection_extract(., "POLYGON")} #after cropping, can end up with mixed geometry type: get only polygons (includes MULTIPOLYGON)
   }
 
   if(is.null(feature_names)){
