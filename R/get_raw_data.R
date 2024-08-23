@@ -5,13 +5,12 @@
 #'
 #' @param spatial_grid `sf` polygon to crop/ mask/ intersect data with
 #' @param dat `terra::rast()` or `sf` data
-#' @param meth `string` name of method to use for raster projection if data is raster
 #' @param matching_crs `logical` TRUE if `spatial_grid` and `dat` have the same crs
 #' @param antimeridian `logical` TRUE if cropping area crosses the antimeridian
 #'
 #' @return `terra::rast()` or `sf`; same as `dat`
 #' @noRd
-get_raw_data <- function(spatial_grid, dat, meth, matching_crs, antimeridian){
+get_raw_data <- function(spatial_grid, dat, matching_crs, antimeridian){
 
   if(check_raster(dat)){
     if(matching_crs){
@@ -23,7 +22,7 @@ get_raw_data <- function(spatial_grid, dat, meth, matching_crs, antimeridian){
         sf::st_transform(sf::st_crs(dat)) %>%
         sf::st_as_sf() %>%
         {if(antimeridian) terra::crop(terra::rotate(dat, left = FALSE), sf::st_shift_longitude(.)) else terra::crop(dat, .)} %>%
-        terra::project(terra::crs(spatial_grid), method = meth) %>%
+        terra::project(terra::crs(spatial_grid), method = "average") %>%
         terra::mask(., spatial_grid)
     }
   }else{

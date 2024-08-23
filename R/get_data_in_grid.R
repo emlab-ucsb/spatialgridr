@@ -70,7 +70,7 @@ get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth 
   }
 
   if(raw){
-    get_raw_data(spatial_grid, dat, meth, matching_crs, antimeridian)
+    get_raw_data(spatial_grid, dat, matching_crs, antimeridian)
 
   } else if(check_raster(dat)){
     ras_to_grid(spatial_grid, dat, matching_crs, meth, name, antimeridian)
