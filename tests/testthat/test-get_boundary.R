@@ -15,17 +15,22 @@ test_that("oceans is sf object", {
 })
 
 test_that("retrieving a country matches rnaturalearth", {
-  expect_equal(get_boundary(name = "Australia", type = "countries", country_type = "country"), rnaturalearth::ne_countries(scale = 10, type = "countries", country = "Australia"))
+  expect_equal(get_boundary(name = "Australia", type = "country", country_type = "country"), rnaturalearth::ne_countries(scale = 10, type = "countries", country = "Australia"))
 })
 
 test_that("country is sf object", {
-  expect_s3_class(get_boundary(name = "France", type = "countries", country_type = "sovereign"), "sf")
+  expect_s3_class(get_boundary(name = "France", type = "country", country_type = "sovereign"), "sf")
 })
 
-test_that("bermuda example", {
+test_that("bermuda example, correct number of features", {
   expect_equal(nrow(get_boundary("Bermuda", type = "eez", country_type = "country")), 1)
   })
 
-test_that("kiribati example", {
+test_that("kiribati example, correct numner of features", {
   expect_equal(nrow(get_boundary(name = "Kiribati", type = "eez", country_type = "sovereign")),3)
+})
+
+test_that("sea_oceans returns sf object", {
+  expect_s3_class(get_boundary(name = "Aegean Sea", type = "seas_oceans"),
+                  "sf")
 })

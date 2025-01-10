@@ -7,7 +7,9 @@
 get_boundary(name = "Australia", type = "eez", country_type = "country")
 }
 \arguments{
-\item{name}{\code{character} name of the country or region. If \code{NULL} all boundaries of \code{type} are returned. If an incorrect \code{name} is input, the user is given a list of valid names to chose from.}
+\item{name}{\code{character} name of the country or region. If \code{NULL} all
+boundaries of \code{type} are returned. If an incorrect \code{name} is input, the user
+is given a list of valid names to chose from. Ignored for \code{type = "high_seas"}}
 
 \item{type}{\code{character} the boundary type. Can be one of:
 \itemize{
@@ -16,18 +18,31 @@ get_boundary(name = "Australia", type = "eez", country_type = "country")
 \item \verb{24nm}: 24 nautical miles zone (Contiguous Zone), defined in \href{https://www.un.org/Depts/los/convention_agreements/texts/unclos/part2.htm}{UNCLOS}
 \item \code{ocean}: Global Oceans and Seas as compiled by the Flanders Marine Data Centre. Names are: "Arctic Ocean", "Baltic Sea", "Indian Ocean", "Mediterranean Region", "North Atlantic Ocean", "North Pacific Ocean", "South Atlantic Ocean", "South China and Easter Archipelagic Seas", "South Pacific Ocean", and "Southern Ocean".
 \item \code{high_seas}: as defined by the UN Law of the Sea: "all parts of the sea that are not included in the exclusive economic zone, in the territorial sea or in the internal waters of a State, or in the archipelagic waters of an archipelagic State". Note that \code{name} and \code{country_type} are not relevant for this query: only all High Seas areas can be downloaded.
-\item \code{countries}: country boundaries
+\item \code{country}: country boundaries from Natural Earth
+\item \code{seas_oceans}: Seas, oceans, bays, gulfs, inlets etc. as defined in the Natural Earth marine polygons
 }
 
-More details on the marine boundaries can be found on the \href{https://marineregions.org/sources.php}{Marine Regions website}, and for land boundaries, the \href{https://www.naturalearthdata.com/features/}{Natural Earth website}. Note that this function retrieves data from Natural Earth at the highest resolution (1:10m).}
+More details on the marine boundaries can be found on the \href{https://marineregions.org/sources.php}{Marine Regions website}, and for land boundaries
+(plus "seas_oceans"), the \href{https://www.naturalearthdata.com/features/}{Natural Earth website}. Note that data from
+Natural Earth is downlaoded at the highest resolution (1:10m).}
 
-\item{country_type}{\code{character} must be either \code{country} or \code{sovereign}. Some countries have many territories that it has jurisdiction over. For example, Australia, France and the U.K. have jurisdiction over many overseas islands. Using \code{sovereign} returns the main country and all the territories, whereas using \code{country} returns just the main country. More details about what is a country via the \code{rnaturalearth} package \href{https://cran.r-project.org/web/packages/rnaturalearth/vignettes/what-is-a-country.html}{vignette}}
+\item{country_type}{\code{character} must be either \code{country} or \code{sovereign};
+ignored for \code{type = "high_seas"}, \code{"ocean"} or \code{"seas_oceans"}. Some
+countries have many territories that it has jurisdiction over. For example,
+Australia, France and the U.K. have jurisdiction over many overseas islands.
+Using \code{sovereign} returns the main country and all the territories, whereas
+using \code{country} returns just the main country. More details about what is a
+country via the \code{rnaturalearth} package
+\href{https://cran.r-project.org/web/packages/rnaturalearth/vignettes/what-is-a-country.html}{vignette}}
 }
 \value{
 'sf' polygon or multipolygon object of the boundary requested
 }
 \description{
-Marine and land boundaries can be obtained.  For marine boundaries, the \code{mrp_get} function from the \code{mregions2} package is used to retrieve the boundary (e.g. an EEZ) from \href{https://marineregions.org/gazetteer.php}{Marine Regions}. For land boundaries, the package \href{https://github.com/ropensci/rnaturalearth/}{\code{rnaturalearth}} is used.
+Marine and land boundaries can be obtained.  For marine boundaries, the
+\code{mrp_get} function from the \code{mregions2} package is used to retrieve the
+boundary (e.g. an EEZ) from \href{https://marineregions.org/gazetteer.php}{Marine Regions}. For land boundaries and the "seas_oceans" type, the
+package \href{https://github.com/ropensci/rnaturalearth/}{\code{rnaturalearth}} is used.
 }
 \examples{
 #Marine boundary examples:
@@ -38,15 +53,26 @@ plot(australia_mainland_eez["geometry"])
 #this includes all islands that Australia has jurisdiction over:
 australia_including_territories_eez <- get_boundary(name = "Australia", country_type = "sovereign")
 plot(australia_including_territories_eez["geometry"])
+
+#South Atlantic Ocean area:
+south_atlantic <- get_boundary(name = "South Atlantic Ocean", type = "ocean")
+
+plot(south_atlantic["geometry"])
 }
 
-#Land boundary examples:
+#Land boundary example:
 if(require("rnaturalearth")){
-australia_land <- get_boundary(name = "Australia", type = "countries")
+australia_land <- get_boundary(name = "Australia", type = "country")
 plot(australia_land["geometry"])
 
 #this includes all islands that Australia has jurisdiction over:
-australia_land_and_territories <- get_boundary(name = "Australia", type = "countries", country_type = "sovereign")
+australia_land_and_territories <- get_boundary(name = "Australia", type = "country", country_type = "sovereign")
 plot(australia_land_and_territories["geometry"])
+
+#Sea boundary:
+coral_sea <- get_boundary(name = "Coral Sea", type = "seas_oceans")
+plot(coral_sea["geometry"])
 }
+
+#
 }
