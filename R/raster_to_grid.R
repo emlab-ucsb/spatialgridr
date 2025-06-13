@@ -24,7 +24,7 @@ ras_to_grid <- function(spatial_grid, dat, matching_crs, meth, name, antimeridia
         sf::st_as_sf() %>%
         sf::st_transform(sf::st_crs(dat)) %>%
         sf::st_shift_longitude() %>%
-        terra::crop(terra::rotate(dat, left = FALSE), .) %>%
+        terra::crop(terra::rotate(dat), .) %>%
         terra::project(spatial_grid, method = meth) %>%
         terra::mask(spatial_grid) %>%
         stats::setNames(name)
@@ -53,7 +53,7 @@ ras_to_grid <- function(spatial_grid, dat, matching_crs, meth, name, antimeridia
     }
 
     dat %>%
-      {if(antimeridian) terra::rotate(., left = FALSE) else .}%>%
+      {if(antimeridian) terra::rotate(.) else .}%>%
       exactextractr::exact_extract(temp_grid, meth , force_df = TRUE) %>%
       stats::setNames(name) %>%
       data.frame(temp_grid, .) %>%

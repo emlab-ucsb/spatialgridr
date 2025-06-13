@@ -96,7 +96,7 @@ get_boundary <- function(name = "Australia", type = "eez", country_type = "count
     }
     mregions_country_type <- ifelse(type == "ocean", "name", mregions_country_types_lookup[which(country_types == country_type)])
 
-    query_name_options <- mregions2::mrp_col_unique(query_type, mregions_country_type) |>
+    query_name_options <- mregions2::mrp_col_unique(query_type, mregions_country_type) %>%
       sort()
 
     if(!(name %in% query_name_options)) {
