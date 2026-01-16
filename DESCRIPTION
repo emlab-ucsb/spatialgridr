@@ -1,12 +1,12 @@
 Package: spatialgridr
-Title: Grid spatial data for conservation planning purposes
-Version: 0.0.2.1
+Title: Grid spatial data
+Version: 0.0.2.2
 Authors@R: person(given = "Jason", family = "Flower", email = "jflower@ucsb.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6731-8182"))
-Description: An R package that allows easy gridding of spatial data. Principally intended for spatial conservation planning uses.
+Description: An R package that allows easy gridding of spatial data. 
 License: GPL (>= 3) + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends: 
     R (>= 3.5.0)
 Imports: 

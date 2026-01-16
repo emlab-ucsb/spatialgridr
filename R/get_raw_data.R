@@ -21,7 +21,7 @@ get_raw_data <- function(spatial_grid, dat, matching_crs, antimeridian){
       spatial_grid %>%
         sf::st_transform(sf::st_crs(dat)) %>%
         sf::st_as_sf() %>%
-        {if(antimeridian) terra::crop(terra::rotate(dat, left = FALSE), sf::st_shift_longitude(.)) else terra::crop(dat, .)} %>%
+        {if(antimeridian) terra::crop(terra::rotate(dat), sf::st_shift_longitude(.)) else terra::crop(dat, .)} %>%
         terra::project(terra::crs(spatial_grid), method = "average") %>%
         terra::mask(., spatial_grid)
     }
