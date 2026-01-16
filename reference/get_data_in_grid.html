@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">spatialgridr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,6 +16,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -92,7 +93,7 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># ridges data for area of Pacific</span></span></span>
-<span class="r-in"><span><span class="va">ridges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ridges.rds"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ridges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ridges.rds"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># use get_boundary() to get Samoa's Exclusive Economic Zone</span></span></span>
 <span class="r-in"><span><span class="va">samoa_eez</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_boundary.html">get_boundary</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Samoa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -108,7 +109,7 @@
 <span class="r-plt img"><img src="get_data_in_grid-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Get some raster data on cold water corals for the same spatial grid</span></span></span>
-<span class="r-in"><span><span class="va">cold_coral</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"cold_coral.tif"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cold_coral</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"cold_coral.tif"</span>, package <span class="op">=</span> <span class="st">"spatialgridr"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">coral_gridded</span> <span class="op">&lt;-</span> <span class="fu">get_data_in_grid</span><span class="op">(</span>spatial_grid <span class="op">=</span> <span class="va">samoa_grid</span>, dat <span class="op">=</span> <span class="va">cold_coral</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">coral_gridded</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="get_data_in_grid-2.png" alt="" width="700" height="433"></span>
@@ -123,7 +124,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
