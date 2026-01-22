@@ -59,15 +59,18 @@ plot(samoa_eez["geometry"], axes = TRUE)
 ## Get a grid
 
 We also need to provide a suitable projection for the area we are
-interested in, <https://projectionwizard.org> is useful for this
-purpose. For spatial planning, equal area projections are normally best.
+interested in. [Projection Wizard](https://projectionwizard.org) is
+useful for this purpose. For spatial planning, equal area projections
+are normally best. A good option for the Pacific is
+[EPSG:8859](https://spatialreference.org/ref/epsg/8859/), which is equal
+area and centered on the Pacific.
 
 ``` r
-#equal area projection for Samoa obtained from https://projectionwizard.org
+
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
 # Create a raster grid with 10km sized cells
-samoa_grid <- get_grid(boundary = samoa_eez, resolution = 10000, crs = samoa_projection)
+samoa_grid <- get_grid(boundary = samoa_eez, resolution = 10000, crs = 8859)
 
 #plot the grid
 terra::plot(samoa_grid)
@@ -82,7 +85,7 @@ square or hexagonal cells. We will create and plot a hexagonal grid with
 10 km wide cells.
 
 ``` r
-samoa_grid_sf <- get_grid(boundary = samoa_eez, resolution = 10000, crs = samoa_projection, output = "sf_hex")
+samoa_grid_sf <- get_grid(boundary = samoa_eez, resolution = 10000, crs = 8859, output = "sf_hex")
 
 plot(samoa_grid_sf)
 ```
@@ -105,7 +108,7 @@ ridges_gridded <- get_data_in_grid(spatial_grid = samoa_grid, dat = ridges)
 
 #plot
 terra::plot(ridges_gridded)
-terra::lines(samoa_eez |> sf::st_transform(crs = samoa_projection)) #add Samoa's EEZ
+terra::lines(samoa_eez |> sf::st_transform(crs = 8859)) #add Samoa's EEZ
 ```
 
 ![](reference/figures/README-grid_sf_data-1.png)
@@ -122,7 +125,7 @@ coral_gridded <- get_data_in_grid(spatial_grid = samoa_grid, dat = cold_coral)
 
 #plot
 terra::plot(coral_gridded)
-terra::lines(samoa_eez |> sf::st_transform(crs = samoa_projection)) #add Samoa's EEZ
+terra::lines(samoa_eez |> sf::st_transform(crs = 8859)) #add Samoa's EEZ
 ```
 
 ![](reference/figures/README-grid_raster_data-1.png)
@@ -174,7 +177,7 @@ antimeridian. Here’s an example using Kiribati’s EEZ as the grid area.
 kir_eez <- get_boundary(name = "Kiribati", country_type = "sovereign")
 
 #create a grid for the Kiribati EEZ - Equal area projection obtained from https://projectionwizard.org
-kir_grid <- get_grid(boundary = kir_eez, resolution = 50000, crs = '+proj=laea +lon_0=-159.609375 +lat_0=0 +datum=WGS84 +units=m +no_defs', output = "sf_square")
+kir_grid <- get_grid(boundary = kir_eez, resolution = 50000, crs = 8859, output = "sf_square")
 
 #get abyssal plains classification for Kiribati grid
 kir_abyssal_plains <- get_data_in_grid(spatial_grid = kir_grid, dat = abyssal_plains, feature_names = "Class")
@@ -192,9 +195,6 @@ kir_abyssal_plains <- get_data_in_grid(spatial_grid = kir_grid, dat = abyssal_pl
 #> all geometries
 #> Warning: attribute variables are assumed to be spatially constant throughout
 #> all geometries
-```
-
-``` r
 
 #plot
 plot(kir_abyssal_plains, border = FALSE)
@@ -213,9 +213,6 @@ and set `raw = TRUE`.
 kir_abyssal_plains_raw <- get_data_in_grid(spatial_grid = kir_eez, dat = abyssal_plains, raw = TRUE)
 #> Warning: attribute variables are assumed to be spatially constant throughout
 #> all geometries
-```
-
-``` r
 
 #shift longitude to make it easier to view data
 plot(kir_abyssal_plains_raw[1] %>% sf::st_shift_longitude(), border = FALSE)
