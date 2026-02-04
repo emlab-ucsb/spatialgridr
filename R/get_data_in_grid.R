@@ -38,13 +38,7 @@ get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth 
   checkmate::assert_multi_class(data, c("SpatRaster", "sf", "character"))
   checkmate::assert_logical(raw, len = 1)
 
-  if(is.null(dat)){
-    stop("Please provide some input data")
-  }
-
-  check_grid(spatial_grid)
-
-  dat <- data_from_filepath(dat)
+  dat <- if(is(dat, "character")) data_from_filepath(dat)
 
   matching_crs <- check_matching_crs(spatial_grid, dat)
 

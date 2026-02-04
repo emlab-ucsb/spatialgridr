@@ -77,18 +77,15 @@ check_sf <- function(sp){
 #' @return `sf` or `terra::rast` format data
 #' @noRd
 data_from_filepath <- function(dat){
-  ## First deal with whether the input is a file or a dataset
-  if (class(dat)[1] == "character") { # If a file, we need to load the data
 
     ext <- tools::file_ext(dat)
-    nm <- basename(dat)
+
     if (ext %in% c("tif", "tiff", "grd", "gri")) {
       print("Data is in raster format")
       terra::rast(dat)
     } else if (ext %in% c("shp", "gpkg")) {
       print("Data is in vector format")
       sf::read_sf(dat)
-    }
-  }
-  return(dat)
+    } else
+
 }
