@@ -25,10 +25,10 @@
 
 get_grid <- function(boundary, resolution = 5000, crs, output = "raster", touches = FALSE){
 
-  if(!check_sf(boundary)) {
-    stop("boundary must be an sf object")}
-
-  if(!(output %in% c("raster", "sf_square", "sf_hex"))) stop("output must be either 'raster', 'sf_square' or 'sf_hex'")
+  checkmate::assert_class(boundary, "sf")
+  checkmate::assert_number(resolution, lower = 0)
+  checkmate::assert_choice(output, c("raster", "sf_square", "sf_hex"))
+  checkmate::assert_logical(touches, len = 1)
 
   chosen_crs <- sf::st_crs(crs)
 

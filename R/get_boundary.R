@@ -80,9 +80,9 @@ get_boundary <- function(name = "Australia", type = "eez", country_type = "count
   mregions_country_types_lookup <- c("territory1", "sovereign1")
   rnaturalearth_country_types_lookup <- c("countries", "sovereignty")
 
-  if(!(type %in% all_types)) stop("'type' must be one of: ", paste(all_types, collapse = ", "))
-
-  if(!(country_type %in% country_types) & !(type %in% c("ocean", "high_seas", "seas_oceans"))) stop(message = "'country_type' must be one of: ", paste(country_types, collapse = ", "))
+  checkmate::check_string(name, null.ok = TRUE)
+  checkmate::assert_choice(type, choices = all_types)
+  checkmate::assert_choice(country_type, c(country_types, "ocean", "high_seas", "seas_oceans"))
 
   if(type %in% mregions_types){
     rlang::check_installed("mregions2", reason = "to use `get_boundary()` to access marine boundaries", action = \(pkg, ...) remotes::install_github("lifewatch/mregions2"))

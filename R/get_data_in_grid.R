@@ -33,6 +33,11 @@
 #' coral_gridded <- get_data_in_grid(spatial_grid = samoa_grid, dat = cold_coral)
 #' terra::plot(coral_gridded)
 get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth = NULL, name = NULL, feature_names = NULL, antimeridian = NULL, cutoff = 0.5){
+
+  checkmate::assert_multi_class(spatial_grid, c("SpatRaster", "sf"))
+  checkmate::assert_multi_class(data, c("SpatRaster", "sf", "character"))
+  checkmate::assert_logical(raw, len = 1)
+
   if(is.null(dat)){
     stop("Please provide some input data")
   }
@@ -44,7 +49,7 @@ get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth 
   matching_crs <- check_matching_crs(spatial_grid, dat)
 
   antimeridian <- if(is.null(antimeridian)){
-    sf_object <- if(check_sf(spatial_grid)) spatial_grid else terra::as.polygons(spatial_grid) %>% sf::st_as_sf()
+    sf_object <- if(is(spatial_grid, "sf")) spatial_grid else terra::as.polygons(spatial_grid) %>% sf::st_as_sf()
     check_antimeridian(sf_object, dat)
   } else antimeridian
 

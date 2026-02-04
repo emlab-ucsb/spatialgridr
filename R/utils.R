@@ -6,11 +6,7 @@
 #'
 #' @noRd
 check_grid <- function(spatial_grid) {
-  if (is.null(spatial_grid)) {
-    stop("a spatial grid must be supplied")
-  } else if (!(class(spatial_grid)[1] %in% c("RasterLayer", "SpatRaster", "sf"))) {
-    stop("spatial_grid must be a raster or sf object")
-  }
+    checkmate::assert_multi_class(spatial_grid, c("SpatRaster", "sf"))
 }
 
 #' Check if area spatial objects have same crs
@@ -88,10 +84,10 @@ data_from_filepath <- function(dat){
     nm <- basename(dat)
     if (ext %in% c("tif", "tiff", "grd", "gri")) {
       print("Data is in raster format")
-      dat <- terra::rast(dat)
+      terra::rast(dat)
     } else if (ext %in% c("shp", "gpkg")) {
       print("Data is in vector format")
-      dat <- sf::read_sf(dat)
+      sf::read_sf(dat)
     }
   }
   return(dat)
