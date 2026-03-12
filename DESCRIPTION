@@ -1,6 +1,6 @@
 Package: spatialgridr
 Title: Grid spatial data
-Version: 0.0.2.2
+Version: 0.0.2.3
 Authors@R: person(given = "Jason", family = "Flower", email = "jflower@ucsb.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6731-8182"))
 Description: An R package that allows easy gridding of spatial data. 
 License: GPL (>= 3) + file LICENSE
@@ -13,16 +13,16 @@ Imports:
     dplyr,
     exactextractr,
     magrittr,
+    mregions2,
     remotes,
     rlang,
+    rnaturalearth,
     sf,
     stats,
     terra,
     utils
 Suggests: 
     codetools,
-    mregions2 (>= 1.0.0),
-    rnaturalearth,
     rnaturalearthhires (>= 1.0.0.9000),
     testthat (>= 3.0.0)
 URL: https://emlab-ucsb.github.io/spatialgridr/
