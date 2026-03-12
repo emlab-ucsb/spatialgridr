@@ -8,12 +8,12 @@
 ## Citation
 
 Flower J (2026). *spatialgridr: Grid spatial data*. R package version
-0.0.2.2, <https://emlab-ucsb.github.io/spatialgridr/>.
+0.0.2.3, <https://emlab-ucsb.github.io/spatialgridr/>.
 
     @Manual{,
       title = {spatialgridr: Grid spatial data},
       author = {Jason Flower},
       year = {2026},
-      note = {R package version 0.0.2.2},
+      note = {R package version 0.0.2.3},
       url = {https://emlab-ucsb.github.io/spatialgridr/},
     }
