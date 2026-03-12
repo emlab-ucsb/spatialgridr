@@ -85,7 +85,6 @@ get_boundary <- function(name = "Australia", type = "eez", country_type = "count
   if(!(country_type %in% country_types) & !(type %in% c("ocean", "high_seas", "seas_oceans"))) stop(message = "'country_type' must be one of: ", paste(country_types, collapse = ", "))
 
   if(type %in% mregions_types){
-    rlang::check_installed("mregions2", reason = "to use `get_boundary()` to access marine boundaries", action = \(pkg, ...) remotes::install_github("lifewatch/mregions2"))
     query_type <- mregions_types_lookup[which(mregions_types == type)]
 
     if(type == "high_seas") return(mregions2::mrp_get("high_seas"))
@@ -106,9 +105,6 @@ get_boundary <- function(name = "Australia", type = "eez", country_type = "count
 
     eval(parse(text = paste0("mregions2::mrp_get(\"", query_type, "\", cql_filter = \"", mregions_country_type, " = '", name, "'\")")))
   } else{
-    rlang::check_installed("rnaturalearth", reason = "to use `get_boundary()` to access land boundaries", action = \(pkg, ...) remotes::install_github("ropensci/rnaturalearth"))
-    rlang::check_installed("rnaturalearthhires", reason = "to use `get_boundary()` to access high resolution land boundaries", action = \(pkg, ...) remotes::install_github("ropensci/rnaturalearthhires"))
-
     if(is.null(name)) {
       message("You have requested all ", type, " boundaries.")
       if(type == "country") return(rnaturalearth::ne_countries(scale = 10, returnclass = "sf")) else{

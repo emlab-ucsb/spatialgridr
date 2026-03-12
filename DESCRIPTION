@@ -17,16 +17,15 @@ Imports:
     remotes,
     rlang,
     rnaturalearth,
+    rnaturalearthhires (>= 1.0.0.9000),
     sf,
     stats,
     terra,
     utils
 Suggests: 
     codetools,
-    rnaturalearthhires (>= 1.0.0.9000),
     testthat (>= 3.0.0)
 URL: https://emlab-ucsb.github.io/spatialgridr/
 Config/testthat/edition: 3
 Remotes: 
-    github::lifewatch/mregions2,
     github::ropensci/rnaturalearthhires
