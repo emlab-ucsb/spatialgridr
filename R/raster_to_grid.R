@@ -17,7 +17,7 @@ ras_to_grid <- function(spatial_grid, dat, matching_crs, meth, name, antimeridia
 
   if(is.null(name)) name <- names(dat)
 
-  if(check_raster(spatial_grid)) {
+  if(is(spatial_grid, "SpatRaster")) {
     if(antimeridian){
       spatial_grid %>%
         terra::as.polygons() %>%

@@ -42,34 +42,6 @@ check_antimeridian <- function(sf_object, dat){
   } else FALSE
 }
 
-#' Check if object is a raster
-#'
-#' @param sp
-#'
-#' @return `logical` TRUE if raster, else FALSE
-#' @noRd
-check_raster <- function(sp){
-  if(class(sp)[1] %in% c("RasterLayer", "SpatRaster")){
-    return(TRUE)
-  }else{
-    return(FALSE)
-  }
-}
-
-#' Check if object is sf
-#'
-#' @param sp
-#'
-#' @return TRUE if sf, else FALSE
-#' @noRd
-check_sf <- function(sp){
-  if(class(sp)[1] == "sf"){
-    return(TRUE)
-  }else{
-    return(FALSE)
-  }
-}
-
 #' If input is character, read in from file pointed to, assuming it is a common vector or raster file format
 #'
 #' @param dat
@@ -87,5 +59,5 @@ data_from_filepath <- function(dat){
       print("Data is in vector format")
       sf::read_sf(dat)
     } else
-
+      stop("File does not appear to be in one of the common spatial data formats, try reading it directly using e.g. `terra::rast()` or `sf::st_read()`")
 }

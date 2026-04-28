@@ -2,6 +2,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom methods is
 #' @importFrom rlang :=
 #' @importFrom rlang .data
 #' @importFrom stats setNames

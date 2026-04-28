@@ -15,7 +15,7 @@
 #' @noRd
 sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, antimeridian, cutoff){
 
-  is_raster <- check_raster(spatial_grid)
+  is_raster <- is(spatial_grid, "SpatRaster")
 
   if(matching_crs) {
     dat_cropped <- dat %>%

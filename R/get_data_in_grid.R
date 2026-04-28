@@ -35,10 +35,15 @@
 get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth = NULL, name = NULL, feature_names = NULL, antimeridian = NULL, cutoff = 0.5){
 
   checkmate::assert_multi_class(spatial_grid, c("SpatRaster", "sf"))
-  checkmate::assert_multi_class(data, c("SpatRaster", "sf", "character"))
+  checkmate::assert_multi_class(dat, c("SpatRaster", "sf", "character"))
   checkmate::assert_logical(raw, len = 1)
+  checkmate::assert_character(meth, len = 1, null.ok = TRUE)
+  checkmate::assert_character(name, len = 1, null.ok = TRUE)
+  checkmate::assert_character(feature_names, len = 1, null.ok = TRUE)
+  checkmate::assert_logical(antimeridian, null.ok = TRUE)
+  checkmate::assert_double(cutoff, lower = 0, len = 1, null.ok = TRUE)
 
-  dat <- if(is(dat, "character")) data_from_filepath(dat)
+if(is(dat, "character")) dat <- data_from_filepath(dat)
 
   matching_crs <- check_matching_crs(spatial_grid, dat)
 
@@ -48,30 +53,30 @@ get_data_in_grid <- function(spatial_grid = NULL, dat = NULL, raw = FALSE, meth 
   } else antimeridian
 
 #setting method for resampling, projecting, etc. a raster - should be 'near' for binary raster otherwise end up with non-binary values
-#previously checking for unique values 0,1,NA, NaN but this is time consuming for global raster so get user to define if binary or not
 
   raster_cell_no_threshold <- 1e4
 
-  if(!is.null(meth)){
+  if (!is.null(meth)) {
     meth <- meth
-  } else if(check_raster(dat)){
-      meth <- dat %>%
-        #take a sample if it is a large raster, and assume that no more than 50% of cells are NA otherwise this will fail
-        {if(terra::ncell(dat)> raster_cell_no_threshold) terra::spatSample(., size = raster_cell_no_threshold/2, na.rm = TRUE) else terra::values(.)} %>%
-        unlist() %>%
-        unique() %>%
-        {if(all(. %in% c(0,1,NA,NaN))) {
-          if(check_raster(spatial_grid)) 'near' else 'mode'
-        } else {
-            if(check_raster(spatial_grid)) 'average' else 'mean'
-          }
+  } else if (is(dat, "SpatRaster")) {
+    #take a sample if it is a large raster, and assume that no more than 50% of cells are NA otherwise this will fail
+    raster_sample <- if (terra::ncell(dat) > raster_cell_no_threshold) {
+      terra::spatSample(dat, size = raster_cell_no_threshold, na.rm = TRUE)
+    } else terra::values(dat)
+
+    raster_unique_values_sample <- unlist(raster_sample) |> unique()
+
+    if (all(raster_unique_values_sample %in% c(0, 1, NA, NaN))) {
+      meth <- if (is(spatial_grid, "SpatRaster")) 'near' else 'mode'
+    } else {
+      meth <- if (is(spatial_grid, "SpatRaster")) 'average' else 'mean'
     }
   }
 
   if(raw){
     get_raw_data(spatial_grid, dat, matching_crs, antimeridian)
 
-  } else if(check_raster(dat)){
+  } else if(is(dat, "SpatRaster")){
     ras_to_grid(spatial_grid, dat, matching_crs, meth, name, antimeridian)
     } else {
 

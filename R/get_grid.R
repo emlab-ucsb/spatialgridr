@@ -32,18 +32,24 @@ get_grid <- function(boundary, resolution = 5000, crs, output = "raster", touche
 
   chosen_crs <- sf::st_crs(crs)
 
-  boundary <- boundary %>%
-    sf::st_geometry() %>%
-    sf::st_sf() %>%
-    {if(sf::st_crs(boundary) == chosen_crs) . else sf::st_transform(., chosen_crs)}
+  boundary <- boundary |>
+    sf::st_geometry() |>
+    sf::st_as_sf()
+
+  if(sf::st_crs(boundary) != chosen_crs) boundary <- sf::st_transform(boundary, chosen_crs)
 
   if(output == "raster") {
-    boundary %>%
-      terra::rast(resolution = resolution) %>%
-      terra::rasterize(boundary, ., touches = touches, field = 1)
+      terra::rasterize(x = boundary,
+                       y = terra::rast(x = boundary, resolution = resolution),
+                       touches = touches,
+                       field = 1)
 
   } else{
     grid_out <- if(output == "sf_square") sf::st_make_grid(boundary, cellsize = resolution, square = TRUE) %>% sf::st_sf() else sf::st_make_grid(boundary, cellsize = resolution, square = FALSE) %>% sf::st_sf()
+
+
+    grid_out <- sf::st_make_grid(boundary, cellsize = resolution, square = (output == "sf_square"))
+
 
     if (touches){
       grid_intersect <- grid_out
@@ -51,16 +57,20 @@ get_grid <- function(boundary, resolution = 5000, crs, output = "raster", touche
       grid_intersect <- sf::st_centroid(grid_out)
     }
 
-    overlap <- sf::st_intersects(grid_intersect, boundary) %>%
+    overlap <- sf::st_intersects(grid_intersect, boundary) |>
       lengths() > 0
 
-    grid_out[overlap,] %>%
-      dplyr::bind_cols(sf::st_coordinates(sf::st_centroid(.)) %>%
-                         as.data.frame() %>%
-                         dplyr::select("X", "Y")) %>%
-      dplyr::mutate(X = round(.data$X, digits = 4),
-                    Y = round(.data$Y, digits = 4)) %>%
-      dplyr::arrange(dplyr::desc(.data$Y), .data$X) %>%
-      dplyr::select(-"X", -"Y")
+    grid_out <- grid_out[overlap,]
+
+    #order polygons from top left (max y, min x) to bottom right (min y, max x)
+
+    grid_xy <- sf::st_centroid(grid_out) |>
+      sf::st_coordinates() |>
+      as.data.frame() |>
+      round(digits = 4)
+
+    grid_out[order(grid_xy[,"Y"], grid_xy[,"X"], decreasing = c(TRUE, FALSE)),] |>
+      sf::st_as_sf()
+
   }
 }
