@@ -18,15 +18,16 @@ sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, ant
   is_raster <- is(spatial_grid, "SpatRaster")
 
   if(matching_crs) {
-    dat_cropped <- dat %>%
+    dat_cropped <- dat |>
       sf::st_crop(spatial_grid)
   } else{
-    grid_temp <- spatial_grid %>%
-      {if(is_raster) terra::as.polygons(.) %>% sf::st_as_sf() else .} %>%
-      sf::st_transform(sf::st_crs(dat)) %>%
-      {if(antimeridian) sf::st_shift_longitude(.) else .}
+    grid_temp <- spatial_grid |>
+      (\(x) if(is_raster) terra::as.polygons(x) |>  sf::st_as_sf() else x)() |>
+      sf::st_transform(sf::st_crs(dat)) |>
+      (\(x) if(antimeridian) sf::st_shift_longitude(x) else x)()
 
-    dat_cropped <- dat %>%
+    #START FINAL CODE REFACTORING HERE
+    dat_cropped <- dat
       {if(all(antimeridian & !(c("POINT", "MULTIPOINT") %in% unique(sf::st_geometry_type(.))))) {
         sf::st_break_antimeridian(., lon_0 = 180) %>% sf::st_shift_longitude()}
         else if(all(antimeridian & (c("POINT", "MULTIPOINT") %in% unique(sf::st_geometry_type(.))))){
@@ -44,8 +45,8 @@ sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, ant
     if(nrow(dat_cropped) == 0){
       message("No ", name, " in grid")
       if(is_raster){
-        return(spatial_grid %>%
-                 terra::subst(1,0) %>%
+        return(spatial_grid |>
+                 terra::subst(1,0) |>
                  setNames(name))
       } else{
         return(spatial_grid %>%

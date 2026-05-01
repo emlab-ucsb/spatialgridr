@@ -3,8 +3,9 @@
 #'Marine and land boundaries can be obtained.  For marine boundaries, the
 #'`mrp_get` function from the `mregions2` package is used to retrieve the
 #'boundary (e.g. an EEZ) from [Marine
-#'Regions](https://marineregions.org/gazetteer.php). For land boundaries and the "seas_oceans" type, the
-#'package [`rnaturalearth`](https://github.com/ropensci/rnaturalearth/) is used.
+#'Regions](https://marineregions.org/gazetteer.php). For land boundaries and the
+#'"seas_oceans" type, the package
+#'[`rnaturalearth`](https://github.com/ropensci/rnaturalearth/) is used.
 #'
 #'@param name `character` name of the country or region. If `NULL` all
 #'  boundaries of `type` are returned. If an incorrect `name` is input, the user
@@ -59,7 +60,8 @@
 #'plot(australia_land["geometry"])
 #'
 #'#this includes all islands that Australia has jurisdiction over:
-#'australia_land_and_territories <- get_boundary(name = "Australia", type = "country", country_type = "sovereign")
+#'australia_land_and_territories <-
+#'get_boundary(name = "Australia", type = "country", country_type = "sovereign")
 #'plot(australia_land_and_territories["geometry"])
 #'
 #' #Sea boundary:
