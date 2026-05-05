@@ -162,18 +162,18 @@ sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, ant
               dplyr::select({{layer}})
            })()
         } else{
-        intersected_data_list[[layer]] <- spatial_grid_geom %>%
+        intersected_data_list[[layer]] <- spatial_grid_geom |>
           dplyr::mutate({{layer}} := 0, .before = 1)
       }
     }
-    intersected_data_df <- lapply(intersected_data_list, function(x) sf::st_drop_geometry(x)) %>%
-      do.call(cbind, .)
+    intersected_data_df <- lapply(intersected_data_list, function(x) sf::st_drop_geometry(x)) |>
+      do.call(cbind, args = _)
 
     nms <- colnames(intersected_data_df)
 
-    intersected_data_sf <- intersected_data_df %>%
-      {if(grid_has_extra_cols) cbind(extra_cols, .) else .} %>%
-      sf::st_set_geometry(sf::st_geometry(intersected_data_list[[1]])) %>%
+    intersected_data_sf <- intersected_data_df |>
+      (\(x) if(grid_has_extra_cols) cbind(extra_cols, x) else x)() |>
+      sf::st_set_geometry(sf::st_geometry(intersected_data_list[[1]])) |>
       sf::st_set_geometry("geometry")
 
     if(is.null(feature_names)) {
@@ -184,7 +184,7 @@ sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, ant
       missing_feature_nms <- setdiff(unique(dat[[feature_names]]), nms)
 
       new_cols <- data.frame(matrix(data = 0, ncol= length(missing_feature_nms), nrow=nrow(spatial_grid), dimnames=list(NULL, missing_feature_nms)))
-      return(intersected_data_sf %>%
+      return(intersected_data_sf |>
                dplyr::bind_cols(new_cols))
 
     }

@@ -2,7 +2,7 @@
 
 #' Check a spatial grid is supplied and in raster or sf format
 #'
-#' @param spatial_grid
+#' @param spatial_grid `sf` or `terra::rast()` grid
 #'
 #' @noRd
 check_grid <- function(spatial_grid) {
@@ -22,13 +22,13 @@ check_matching_crs <- function(sp1, sp2){
 
 #' Check if sf object spans the antimeridian
 #'
-#' @param sf_object
+#' @param sf_object `sf` object to check
 #'
 #' @return `logical` TRUE if it does span the antimeridian, FALSE if it doesn't
 #' @noRd
 check_antimeridian <- function(sf_object, dat){
   if(sf::st_crs(sf_object) != sf::st_crs(4326)){
-    b_box <- sf::st_transform(sf_object, 4326) %>%
+    b_box <- sf::st_transform(sf_object, 4326) |>
       sf::st_bbox()
   } else{
     b_box <- sf::st_bbox(sf_object)
@@ -44,7 +44,7 @@ check_antimeridian <- function(sf_object, dat){
 
 #' If input is character, read in from file pointed to, assuming it is a common vector or raster file format
 #'
-#' @param dat
+#' @param dat Argument from `get_data_in_grid()` that is checked
 #'
 #' @return `sf` or `terra::rast` format data
 #' @noRd

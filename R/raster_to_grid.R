@@ -26,7 +26,7 @@ ras_to_grid <- function(spatial_grid, dat, matching_crs, meth, name, antimeridia
         sf::st_shift_longitude() |>
         terra::crop(x = terra::rotate(dat), y = _) |>
         terra::project(spatial_grid, method = meth) |>
-        terra::mask(spatial_grid) %>%
+        terra::mask(spatial_grid) |>
         stats::setNames(name)
     }else{
       cropped_data <- if(matching_crs) {
@@ -40,7 +40,7 @@ ras_to_grid <- function(spatial_grid, dat, matching_crs, meth, name, antimeridia
         }
 
       cropped_data |>
-            terra::mask(spatial_grid) %>%
+            terra::mask(spatial_grid) |>
             stats::setNames(name)
     }
   } else {

@@ -80,7 +80,7 @@ if(is(dat, "character")) dat <- data_from_filepath(dat)
   matching_crs <- check_matching_crs(spatial_grid, dat)
 
   antimeridian <- if(is.null(antimeridian)){
-    sf_object <- if(is(spatial_grid, "sf")) spatial_grid else terra::as.polygons(spatial_grid) %>% sf::st_as_sf()
+    sf_object <- if(is(spatial_grid, "sf")) spatial_grid else terra::as.polygons(spatial_grid) |> sf::st_as_sf()
     check_antimeridian(sf_object, dat)
   } else antimeridian
 
