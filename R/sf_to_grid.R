@@ -161,8 +161,7 @@ sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, ant
                                                            .default = 0)) |>
               dplyr::select({{layer}})
            })()
-        }
-      } else{
+        } else{
         intersected_data_list[[layer]] <- spatial_grid_geom %>%
           dplyr::mutate({{layer}} := 0, .before = 1)
       }
