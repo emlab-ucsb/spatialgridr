@@ -98,11 +98,14 @@ gridded data depending on the format of the spatial grid provided
 
 ``` r
 # ridges data for area of Pacific
-ridges <- system.file("extdata", "ridges.rds", package = "spatialgridr") %>% readRDS()
+ridges <- system.file("extdata", "ridges.rds", package = "spatialgridr") |>  readRDS()
 # use get_boundary() to get Samoa's Exclusive Economic Zone
 samoa_eez <- get_boundary(name = "Samoa")
 
-# You need a suitable projection for your area of interest, https://projectionwizard.org is useful for this purpose. If you are doing spatial planning, equal area projections are normally best.
+# You need a suitable projection for your area of interest, https://projectionwizard.org is
+# useful for this purpose. If you are doing spatial planning,
+# equal area projections are normally best.
+
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
 # Create a spatial grid with 5km square cells
@@ -114,7 +117,7 @@ terra::plot(ridges_gridded)
 
 
 #Get some raster data on cold water corals for the same spatial grid
-cold_coral <- system.file("extdata", "cold_coral.tif", package = "spatialgridr") %>% terra::rast()
+cold_coral <- system.file("extdata", "cold_coral.tif", package = "spatialgridr") |>  terra::rast()
 coral_gridded <- get_data_in_grid(spatial_grid = samoa_grid, dat = cold_coral)
 terra::plot(coral_gridded)
 ```

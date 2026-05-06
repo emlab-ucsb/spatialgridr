@@ -12,6 +12,7 @@ You can install the development version of `spatialgridr` from GitHub
 with:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("emlab-ucsb/spatialgridr")
 ```
@@ -33,6 +34,7 @@ This shows how to obtain a spatial grid and grid some data using that
 grid.
 
 ``` r
+
 #load the package
 library(spatialgridr)
 ```
@@ -48,6 +50,7 @@ Zones (EEZs), oceans, and several other jurisdiction types using
 In this example we will get the EEZ for the Pacific island of Samoa.
 
 ``` r
+
 #get Samoa's EEZ
 samoa_eez <- get_boundary(name = "Samoa")
 
@@ -67,6 +70,7 @@ area and centered on the Pacific.
 
 ``` r
 
+
 samoa_projection <- '+proj=laea +lon_0=-172.5 +lat_0=0 +datum=WGS84 +units=m +no_defs'
 
 # Create a raster grid with 10km sized cells
@@ -85,6 +89,7 @@ square or hexagonal cells. We will create and plot a hexagonal grid with
 10 km wide cells.
 
 ``` r
+
 samoa_grid_sf <- get_grid(boundary = samoa_eez, resolution = 10000, crs = 8859, output = "sf_hex")
 
 plot(samoa_grid_sf)
@@ -100,6 +105,7 @@ or `sf` format. Here’s an example using a global map of seafloor ridges
 which is in `sf` format:
 
 ``` r
+
 # ridges data for area of Pacific
 ridges <- readRDS(system.file("extdata", "ridges.rds", package = "spatialgridr"))
 
@@ -117,6 +123,7 @@ And another example using raster data, in this case global cold water
 coral distribution data which has been pre-cropped to the Pacific
 
 ``` r
+
 #load cold water coral data
 cold_coral <- terra::rast(system.file("extdata", "cold_coral.tif", package = "spatialgridr"))
 
@@ -134,6 +141,7 @@ We can also use the sf grid we created to return gridded data in sf
 format:
 
 ``` r
+
 #grid the data
 ridges_gridded_sf <- get_data_in_grid(spatial_grid = samoa_grid_sf, dat = ridges)
 
@@ -152,6 +160,7 @@ that classifies the worlds deep oceans (Abyssal plains) into 3
 categories:
 
 ``` r
+
 #load the data
 abyssal_plains <- system.file("extdata", "abyssal_plains.rds", package = "spatialgridr") |>
   readRDS()
@@ -173,6 +182,7 @@ function will automatically determine if the grid crosses the
 antimeridian. Here’s an example using Kiribati’s EEZ as the grid area.
 
 ``` r
+
 #load the Kiribati EEZ polygon
 kir_eez <- get_boundary(name = "Kiribati", country_type = "sovereign")
 
@@ -210,17 +220,19 @@ can provide an `sf` polygon to
 and set `raw = TRUE`.
 
 ``` r
+
 kir_abyssal_plains_raw <- get_data_in_grid(spatial_grid = kir_eez, dat = abyssal_plains, raw = TRUE)
 #> Warning: attribute variables are assumed to be spatially constant throughout
 #> all geometries
 
 #shift longitude to make it easier to view data
-plot(kir_abyssal_plains_raw[1] %>% sf::st_shift_longitude(), border = FALSE)
+plot(kir_abyssal_plains_raw[1] |> sf::st_shift_longitude(), border = FALSE)
 ```
 
 ![](reference/figures/README-raw_data_sf-1.png)
 
 ``` r
+
 samoa_coral_raw <- get_data_in_grid(spatial_grid = samoa_eez, dat = cold_coral, raw = TRUE)
 
 terra::plot(samoa_coral_raw)
