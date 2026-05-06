@@ -27,7 +27,7 @@ sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, ant
       (\(x) if(antimeridian) sf::st_shift_longitude(x) else x)()
 
     if(antimeridian){
-      if(!(c("POINT", "MULTIPOINT") %in% unique(sf::st_geometry_type(.)))){
+      if(!(any(c("POINT", "MULTIPOINT") %in% unique(sf::st_geometry_type(dat))))){
         dat_temp <- dat |>
           sf::st_break_antimeridian(lon_0 = 180) |>
           sf::st_shift_longitude()
@@ -88,8 +88,7 @@ sf_to_grid <- function(spatial_grid, dat, matching_crs, name, feature_names, ant
       }
     }
 
-    dat_grouped <- dat_cropped |>
-      dplyr::group_by(.data[[feature_names]]) |>
+    dat_grouped <- dplyr::group_by(dat_cropped, dat_cropped[[feature_names]]) |>
       dplyr::summarise() |>
       dplyr::ungroup() |>
       (\(x) if(all(c("POLYGON", "MULTIPOLYGON") %in% (sf::st_geometry_type(x) |>  unique() |>  as.character()))) sf::st_cast(x, to = "MULTIPOLYGON") else x)()
