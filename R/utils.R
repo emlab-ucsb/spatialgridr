@@ -2,15 +2,11 @@
 
 #' Check a spatial grid is supplied and in raster or sf format
 #'
-#' @param spatial_grid
+#' @param spatial_grid `sf` or `terra::rast()` grid
 #'
 #' @noRd
 check_grid <- function(spatial_grid) {
-  if (is.null(spatial_grid)) {
-    stop("a spatial grid must be supplied")
-  } else if (!(class(spatial_grid)[1] %in% c("RasterLayer", "SpatRaster", "sf"))) {
-    stop("spatial_grid must be a raster or sf object")
-  }
+    checkmate::assert_multi_class(spatial_grid, c("SpatRaster", "sf"))
 }
 
 #' Check if area spatial objects have same crs
@@ -26,13 +22,13 @@ check_matching_crs <- function(sp1, sp2){
 
 #' Check if sf object spans the antimeridian
 #'
-#' @param sf_object
+#' @param sf_object `sf` object to check
 #'
 #' @return `logical` TRUE if it does span the antimeridian, FALSE if it doesn't
 #' @noRd
 check_antimeridian <- function(sf_object, dat){
   if(sf::st_crs(sf_object) != sf::st_crs(4326)){
-    b_box <- sf::st_transform(sf_object, 4326) %>%
+    b_box <- sf::st_transform(sf_object, 4326) |>
       sf::st_bbox()
   } else{
     b_box <- sf::st_bbox(sf_object)
@@ -46,53 +42,22 @@ check_antimeridian <- function(sf_object, dat){
   } else FALSE
 }
 
-#' Check if object is a raster
-#'
-#' @param sp
-#'
-#' @return `logical` TRUE if raster, else FALSE
-#' @noRd
-check_raster <- function(sp){
-  if(class(sp)[1] %in% c("RasterLayer", "SpatRaster")){
-    return(TRUE)
-  }else{
-    return(FALSE)
-  }
-}
-
-#' Check if object is sf
-#'
-#' @param sp
-#'
-#' @return TRUE if sf, else FALSE
-#' @noRd
-check_sf <- function(sp){
-  if(class(sp)[1] == "sf"){
-    return(TRUE)
-  }else{
-    return(FALSE)
-  }
-}
-
 #' If input is character, read in from file pointed to, assuming it is a common vector or raster file format
 #'
-#' @param dat
+#' @param dat Argument from `get_data_in_grid()` that is checked
 #'
 #' @return `sf` or `terra::rast` format data
 #' @noRd
 data_from_filepath <- function(dat){
-  ## First deal with whether the input is a file or a dataset
-  if (class(dat)[1] == "character") { # If a file, we need to load the data
 
     ext <- tools::file_ext(dat)
-    nm <- basename(dat)
+
     if (ext %in% c("tif", "tiff", "grd", "gri")) {
       print("Data is in raster format")
-      dat <- terra::rast(dat)
+      terra::rast(dat)
     } else if (ext %in% c("shp", "gpkg")) {
       print("Data is in vector format")
-      dat <- sf::read_sf(dat)
-    }
-  }
-  return(dat)
+      sf::read_sf(dat)
+    } else
+      stop("File does not appear to be in one of the common spatial data formats, try reading it directly using e.g. `terra::rast()` or `sf::st_read()`")
 }

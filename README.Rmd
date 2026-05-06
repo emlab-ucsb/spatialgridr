@@ -172,7 +172,7 @@ If you just want to get data for an area, but don't want to grid it, you can pro
 kir_abyssal_plains_raw <- get_data_in_grid(spatial_grid = kir_eez, dat = abyssal_plains, raw = TRUE)
 
 #shift longitude to make it easier to view data
-plot(kir_abyssal_plains_raw[1] %>% sf::st_shift_longitude(), border = FALSE)
+plot(kir_abyssal_plains_raw[1] |> sf::st_shift_longitude(), border = FALSE)
 ```
 
 ```{r raw_data_raster}

@@ -6,14 +6,15 @@ Description: An R package that allows easy gridding of spatial data.
 License: GPL (>= 3) + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.2.0)
 Imports: 
+    checkmate,
     dplyr,
     exactextractr,
     magrittr,
     mregions2,
+    methods,
     remotes,
     rlang,
     rnaturalearth,
@@ -29,3 +30,4 @@ URL: https://emlab-ucsb.github.io/spatialgridr/
 Config/testthat/edition: 3
 Remotes: 
     github::ropensci/rnaturalearthhires
+Config/roxygen2/version: 8.0.0
