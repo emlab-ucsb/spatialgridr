@@ -4,9 +4,10 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
-name: R-CMD-check
+name: R-CMD-check.yaml
+
+permissions: read-all
 
 jobs:
   R-CMD-check:
@@ -27,10 +28,9 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      PKG_SYSREQS: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -38,11 +38,6 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: true
-
-      - name: dependencies on Linux
-        if: runner.os == 'Linux'
-        run: sudo apt-get install -y libcurl4-gnutls-dev libssl-dev libgeos-dev make git libgdal-dev gdal-bin libproj-dev libsqlite3-dev libudunits2-dev pandoc librdf0-dev libicu-dev libxml2-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -52,3 +47,4 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
