@@ -105,8 +105,7 @@ australia_land <- get_boundary(name = "Australia", type = "country")
 plot(australia_land["geometry"])
 
 #this includes all islands that Australia has jurisdiction over:
-australia_land_and_territories <-
-get_boundary(name = "Australia", type = "country", country_type = "sovereign")
+australia_land_and_territories <- get_boundary(name = "Australia", type = "country", country_type = "sovereign")
 plot(australia_land_and_territories["geometry"])
 
 #Sea boundary:
