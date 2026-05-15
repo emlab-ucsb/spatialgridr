@@ -41,8 +41,9 @@ country via the \code{rnaturalearth} package
 \description{
 Marine and land boundaries can be obtained.  For marine boundaries, the
 \code{mrp_get} function from the \code{mregions2} package is used to retrieve the
-boundary (e.g. an EEZ) from \href{https://marineregions.org/gazetteer.php}{Marine Regions}. For land boundaries and the "seas_oceans" type, the
-package \href{https://github.com/ropensci/rnaturalearth/}{\code{rnaturalearth}} is used.
+boundary (e.g. an EEZ) from \href{https://marineregions.org/gazetteer.php}{Marine Regions}. For land boundaries and the
+"seas_oceans" type, the package
+\href{https://github.com/ropensci/rnaturalearth/}{\code{rnaturalearth}} is used.
 }
 \examples{
 #Marine boundary examples:
@@ -66,7 +67,8 @@ australia_land <- get_boundary(name = "Australia", type = "country")
 plot(australia_land["geometry"])
 
 #this includes all islands that Australia has jurisdiction over:
-australia_land_and_territories <- get_boundary(name = "Australia", type = "country", country_type = "sovereign")
+australia_land_and_territories <-
+get_boundary(name = "Australia", type = "country", country_type = "sovereign")
 plot(australia_land_and_territories["geometry"])
 
 #Sea boundary:
