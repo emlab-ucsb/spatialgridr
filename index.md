@@ -226,7 +226,7 @@ kir_abyssal_plains_raw <- get_data_in_grid(spatial_grid = kir_eez, dat = abyssal
 #> all geometries
 
 #shift longitude to make it easier to view data
-plot(kir_abyssal_plains_raw[1] %>% sf::st_shift_longitude(), border = FALSE)
+plot(kir_abyssal_plains_raw[1] |> sf::st_shift_longitude(), border = FALSE)
 ```
 
 ![](reference/figures/README-raw_data_sf-1.png)
