@@ -67,11 +67,8 @@ get_grid <- function(boundary, resolution = 5000, crs, output = "raster", touche
                        field = 1)
 
   } else{
-    grid_out <- if(output == "sf_square") sf::st_make_grid(boundary, cellsize = resolution, square = TRUE) |> sf::st_sf() else sf::st_make_grid(boundary, cellsize = resolution, square = FALSE) |> sf::st_sf()
-
 
     grid_out <- sf::st_make_grid(boundary, cellsize = resolution, square = (output == "sf_square"))
-
 
     if (touches){
       grid_intersect <- grid_out
