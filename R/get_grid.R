@@ -92,7 +92,7 @@ get_grid <- function(boundary, resolution = 5000, crs, output = "raster", touche
       round(digits = 4)
 
     grid_out[order(grid_xy[,"Y"], grid_xy[,"X"], decreasing = c(TRUE, FALSE)),] |>
-      sf::st_as_sf()
+      sf::st_sf(geometry = _)
 
   }
 }
