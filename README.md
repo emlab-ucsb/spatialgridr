@@ -8,11 +8,15 @@
 
 # spatialgridr <a href="https://emlab-ucsb.github.io/spatialgridr/"><img src="man/figures/logo.png" align="right" height="139" alt="spatialgridr website" /></a>
 
-`spatialgridr` provides functions for gridding spatial data; i.e. taking
-raw spatial data and getting that data into a grid.
+`spatialgridr` provides functions for retrieving spatial boundaries
+(marine and land), and gridding spatial data; i.e. taking raw spatial
+data and getting that data into a grid.
 
-This package is still under development. Feel free to submit an issue
-with bugs or suggestions.
+## PACKAGE NO LONGER BEING DEVELOPED
+
+`spatialgridr` functions are now part of the
+[`oceandatr`](https://github.com/emlab-ucsb/oceandatr) package which is
+being actively developed. Please use that package instead.
 
 ## Installation
 
