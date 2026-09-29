@@ -72,8 +72,8 @@
 #'#
 get_boundary <- function(name = "Australia", type = "eez", country_type = "country"){
 
-  mregions_types <- c("eez", "12nm", "24nm", "ocean", "high_seas")
-  mregions_types_lookup <- c("eez", "eez_12nm", "eez_24nm", "goas", "high_seas")
+  mregions_types <- c("eez", "12nm", "24nm", "internal", "archipelagic", "ocean", "high_seas")
+  mregions_types_lookup <- c("eez", "eez_12nm", "eez_24nm", "eez_internal_waters", "eez_archipelagic_waters", "goas", "high_seas")
 
   rnaturalearth_type <- c("country", "seas_oceans")
   all_types <- c(mregions_types, rnaturalearth_type)
